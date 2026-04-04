@@ -4,21 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مرتجع المشتريات - تك ستور</title>
+    <title>مرتجع المبيعات - تك ستور</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="navbar.css?v=13.0">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --primary: #10b981;
-            --bg: #f8fafc;
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --success: #10b981;
+            --bg: #f3f4f6;
             --panel: #ffffff;
-            --text: #1e293b;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --blue: #3b82f6;
-            --border: #e2e8f0;
         }
 
         * {
@@ -28,11 +30,11 @@
             padding: 0;
         }
 
-        /* 1. هيكلة السايد بار مع المحتوى */
         html,
         body {
             height: 100vh;
             overflow: hidden;
+            width: 100%;
         }
 
         body {
@@ -42,322 +44,467 @@
             flex-direction: row;
         }
 
-        /* 2. حاوية المحتوى الأساسية */
         .page-container {
             flex: 1;
             height: 100vh;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 2rem;
+            position: relative;
         }
 
         .page-header {
-            margin-bottom: 1.5rem;
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 20px 25px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
-            padding: 15px 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         .page-title {
             font-size: 1.8rem;
             font-weight: 900;
-            color: var(--warning);
+            color: var(--text);
+            margin: 0;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .search-box {
             background: var(--panel);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border);
             display: flex;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             align-items: center;
-            border: 1px solid var(--border);
         }
 
         .search-box input {
             flex: 1;
-            padding: 12px 20px;
+            padding: 12px 15px;
             border: 2px solid var(--border);
             border-radius: 8px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             outline: none;
+            font-weight: bold;
             transition: 0.3s;
         }
 
         .search-box input:focus {
-            border-color: var(--warning);
+            border-color: var(--primary);
         }
 
         .btn {
-            padding: 10px 25px;
+            padding: 12px 25px;
             border: none;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
-            font-size: 1.1rem;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            font-size: 1rem;
         }
 
         .btn-search {
-            background: #1e293b;
+            background: var(--text);
             color: white;
+            height: 48px;
         }
 
         .btn-search:hover {
-            background: #334155;
+            background: #000;
         }
 
         .btn-return {
-            background: #fef3c7;
-            color: #d97706;
-            padding: 6px 15px;
+            background: #fee2e2;
+            color: var(--danger);
             font-size: 0.9rem;
+            padding: 8px 15px;
         }
 
         .btn-return:hover {
-            background: #d97706;
+            background: var(--danger);
             color: white;
         }
 
         .btn-disabled {
-            background: #f1f5f9;
+            background: #f8fafc;
             color: #94a3b8;
             cursor: not-allowed;
-            padding: 6px 15px;
-            font-size: 0.9rem;
+            padding: 8px 15px;
+            font-size: 0.95rem;
             border: 1px solid var(--border);
         }
 
-        .invoice-card {
-            background: white;
+        .erp-document {
+            background: var(--panel);
             border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-            display: none;
-            margin-bottom: 30px;
             border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .invoice-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px dashed var(--border);
+        }
+
+        .table-responsive {
+            width: 100%;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            min-width: 750px;
         }
 
         th {
             background: #f8fafc;
-            color: #64748b;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
             border-bottom: 2px solid var(--border);
+            color: var(--text-light);
         }
 
         td {
-            padding: 15px;
-            border-bottom: 1px solid #f1f5f9;
-            font-weight: 600;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
             text-align: center;
+            font-weight: 600;
         }
 
-        .returns-log-section {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-            border: 1px solid var(--border);
-            overflow-x: auto;
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        /* =======================================================
+           📱 الميديا كويري (Responsive) القاضية
+           ======================================================= */
+        @media (max-width: 950px) {
+
+            html,
+            body {
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+            }
+
+            .page-container {
+                padding: 80px 15px 20px 15px !important;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px;
+            }
+
+            /* 💡 إجبار مربع البحث والزرار تحت بعض بكامل العرض */
+            .search-box {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                padding: 15px !important;
+                gap: 12px !important;
+            }
+
+            .search-box input {
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: none !important;
+            }
+
+            .search-box .btn-search {
+                width: 100% !important;
+                max-width: 100% !important;
+                justify-content: center !important;
+                margin: 0 !important;
+            }
+
+            /* 💡 إجبار الجداول على السكرول العرضي جوا البوكس بتاعها */
+            .erp-document {
+                padding: 15px !important;
+                width: 100% !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+
+            table {
+                min-width: 750px !important;
+            }
+
+            .invoice-info-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- 💡 تم تغيير الـ ID ليتناسب مع navbar.js -->
     <div id="navbar-container"></div>
 
     <div class="page-container">
         <div class="page-header">
-            <h1 class="page-title">📤 مرتجع المشتريات</h1>
+            <h1 class="page-title">
+                <i class="bi bi-arrow-return-left" style="color: var(--danger);"></i>
+                مرتجع المبيعات
+            </h1>
         </div>
 
         <div class="search-box">
-            <input type="number" id="searchId" placeholder="أدخل رقم فاتورة الشراء..."
+            <input type="number" id="searchId" placeholder="🔍 أدخل رقم فاتورة المبيعات للبحث..."
                 onkeypress="if(event.key === 'Enter') searchInvoice()">
-            <button class="btn btn-search" onclick="searchInvoice()"><i class="bi bi-search"></i> بحث</button>
+            <button class="btn btn-search" onclick="searchInvoice()"><i class="bi bi-search"></i> بحث في
+                الفواتير</button>
         </div>
 
-        <div id="invoiceCard" class="invoice-card">
-            <div
-                style="display: flex; justify-content: space-between; border-bottom: 2px dashed #e2e8f0; padding-bottom: 10px; margin-bottom: 15px;">
-                <div>
-                    <h3 style="margin: 0; color: #1e293b;">فاتورة شراء رقم: <span id="invIdDisplay"
-                            style="color: var(--warning);">#0</span></h3>
-                    <div style="color: #64748b; margin-top: 5px; font-size: 0.9rem;">المورد: <strong
-                            id="supplierNameDisplay" style="color: var(--blue);">--</strong></div>
-                </div>
-                <div style="text-align: left;">
-                    <div id="invDateDisplay" style="color: #64748b; font-size: 0.9rem;"></div>
-                </div>
+        <div id="invoiceCard" class="erp-document" style="display:none;">
+            <div class="invoice-info-grid">
+                <div>رقم الفاتورة: <b id="invIdDisplay" style="color: var(--primary); font-size: 1.1rem;">#0</b></div>
+                <div>العميل: <b id="customerNameDisplay" style="color: var(--text);">--</b></div>
+                <div>التاريخ: <span id="invDateDisplay" style="color: var(--text-light);">--</span></div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="text-align: right;">الصنف</th>
-                        <th>تكلفة الشراء</th>
-                        <th>الكمية الأصلية</th>
-                        <th>تم إرجاعه</th>
-                        <th>الإجراء</th>
-                    </tr>
-                </thead>
-                <tbody id="invoiceItems"></tbody>
-            </table>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: right;">الصنف</th>
+                            <th>سعر البيع</th>
+                            <th>الكمية المباعة</th>
+                            <th>تم إرجاعه</th>
+                            <th>الإجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceItemsBody"></tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="returns-log-section">
+        <div class="erp-document">
             <h3
-                style="margin-top: 0; color: #1e293b; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;">
-                📋 سجل مرتجعات المشتريات السابقة</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>رقم المرتجع</th>
-                        <th>التاريخ</th>
-                        <th>المورد</th>
-                        <th>المنتجات</th>
-                        <th>قيمة الاسترداد</th>
-                    </tr>
-                </thead>
-                <tbody id="returnsTableBody"></tbody>
-            </table>
+                style="margin-bottom: 15px; font-size: 1.2rem; border-bottom: 2px dashed var(--border); padding-bottom: 10px; color: var(--text);">
+                📋 سجل مرتجعات المبيعات السابقة
+            </h3>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم المرتجع</th>
+                            <th>التاريخ</th>
+                            <th>العميل</th>
+                            <th style="text-align: right;">المنتجات المستردة</th>
+                            <th>قيمة الاسترداد</th>
+                        </tr>
+                    </thead>
+                    <tbody id="returnsLogBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <script src="navbar.js"></script>
+    <script src="navbar.js?v=13.0"></script>
     <script>
-        let purchasesDB = JSON.parse(localStorage.getItem('pos_purchases')) || [];
-        let purchaseReturnsDB = JSON.parse(localStorage.getItem('pos_purchases_returns')) || [];
+        // 🛡️ كود الحماية (متاح للكاشير والأدمن)
+        const securityCheck = JSON.parse(localStorage.getItem('pos_current_user'));
+        if (!securityCheck) {
+            window.location.replace("login.html");
+        }
+
+        let historyDB = JSON.parse(localStorage.getItem('pos_history')) || [];
+        let salesReturnsDB = JSON.parse(localStorage.getItem('pos_sales_returns')) || [];
         let contactsDB = JSON.parse(localStorage.getItem('pos_contacts')) || [];
-        let currentInvoice = null;
+        let productsDB = JSON.parse(localStorage.getItem('pos_products')) || [];
+        let currentInv = null;
 
         window.onload = function () {
-            renderReturnsLog();
+            renderLog();
+
+            // 💡 رادار الناف بار عشان الأكورديون يفضل مفتوح على المبيعات
+            const checkNavbar = setInterval(() => {
+                const myLink = document.querySelector('a[href*="sales-return.html"]');
+                if (myLink) {
+                    clearInterval(checkNavbar);
+                    myLink.classList.add('active');
+                    const parentMenu = myLink.closest('.dropdown-menu') || myLink.closest('ul');
+                    if (parentMenu) {
+                        parentMenu.style.display = 'flex';
+                        parentMenu.style.flexDirection = 'column';
+                        parentMenu.style.visibility = 'visible';
+                        parentMenu.style.opacity = '1';
+                        parentMenu.classList.add('show', 'open', 'active');
+                        const parentItem = myLink.closest('.nav-item');
+                        if (parentItem) {
+                            parentItem.classList.add('open', 'active');
+                            const mainToggle = parentItem.querySelector('.nav-link');
+                            if (mainToggle) mainToggle.classList.add('active');
+                        }
+                    }
+                }
+            }, 100);
         };
 
         function searchInvoice() {
-            const idToSearch = parseInt(document.getElementById('searchId').value);
-            currentInvoice = purchasesDB.find(inv => inv.id === idToSearch);
+            const id = parseInt(document.getElementById('searchId').value);
+            if (!id) return;
 
-            if (!currentInvoice) {
+            // تحديث الداتا
+            historyDB = JSON.parse(localStorage.getItem('pos_history')) || [];
+            contactsDB = JSON.parse(localStorage.getItem('pos_contacts')) || [];
+            productsDB = JSON.parse(localStorage.getItem('pos_products')) || [];
+
+            currentInv = historyDB.find(inv => inv.id === id);
+
+            if (!currentInv) {
+                Swal.fire('خطأ', 'لم يتم العثور على فاتورة مبيعات بهذا الرقم', 'error');
                 document.getElementById('invoiceCard').style.display = 'none';
-                Swal.fire('خطأ', 'لم يتم العثور على فاتورة مشتريات بهذا الرقم!', 'error');
                 return;
             }
 
-            const supplier = contactsDB.find(c => c.id == currentInvoice.supplierId);
-            const supplierName = supplier ? supplier.name : 'مورد غير معروف';
+            document.getElementById('invIdDisplay').innerText = "INV-" + String(currentInv.id).padStart(4, '0');
+            document.getElementById('customerNameDisplay').innerText = currentInv.customer || "عميل طياري";
+            document.getElementById('invDateDisplay').innerText = currentInv.date;
 
-            document.getElementById('invIdDisplay').innerText = "#" + currentInvoice.id;
-            document.getElementById('supplierNameDisplay').innerText = supplierName;
-            document.getElementById('invDateDisplay').innerText = currentInvoice.date;
-
-            const itemsBody = document.getElementById('invoiceItems');
-            itemsBody.innerHTML = currentInvoice.items.map((item, index) => {
-                const returnedAlready = item.returnedQty || 0;
-                const remainingQty = item.qty - returnedAlready;
-
-                const actionBtn = remainingQty > 0
-                    ? `<button class="btn btn-return" onclick="processReturn(${index})">إرجاع ↩️</button>`
-                    : `<button class="btn-disabled" disabled>تم الإرجاع ✔️</button>`;
-
-                return `
-                    <tr>
-                        <td style="text-align: right;">${item.name}</td>
-                        <td>${item.cost.toFixed(2)} ج.م</td>
-                        <td>${item.qty}</td>
-                        <td style="color: var(--danger); font-weight: bold;">${returnedAlready}</td>
-                        <td>${actionBtn}</td>
-                    </tr>
-                `;
-            }).join('');
-
+            renderInvoiceItems();
             document.getElementById('invoiceCard').style.display = 'block';
         }
 
-        function processReturn(itemIndex) {
-            const item = currentInvoice.items[itemIndex];
-            const remainingQty = item.qty - (item.returnedQty || 0);
+        function renderInvoiceItems() {
+            const itemsBody = document.getElementById('invoiceItemsBody');
+            itemsBody.innerHTML = currentInv.items.map((item, idx) => {
+                const returnedQty = item.returnedQty || 0;
+                const availableToReturn = item.qty - returnedQty;
+
+                let actionBtn = '';
+                // لو كان الصنف صيانة حرة مفيش ليه إرجاع مخزني
+                if (item.isRepair) {
+                    actionBtn = `<span style="color: #94a3b8; font-weight: bold;">خدمة صيانة</span>`;
+                } else if (availableToReturn > 0) {
+                    actionBtn = `<button class="btn btn-return" onclick="processReturn(${idx})"><i class="bi bi-arrow-return-right"></i> استرجاع</button>`;
+                } else {
+                    actionBtn = `<span style="color: var(--success); font-weight: bold;"><i class="bi bi-check2-all"></i> تم الإرجاع بالكامل</span>`;
+                }
+
+                return `
+                <tr>
+                    <td style="text-align: right; font-weight: 800; color: var(--primary-dark);">${item.name}</td>
+                    <td>${(parseFloat(item.price) || 0).toFixed(2)} ج.م</td>
+                    <td style="font-size: 1.1rem;">${item.qty}</td>
+                    <td style="color: var(--danger); font-size: 1.1rem; font-weight: 900;">${returnedQty}</td>
+                    <td style="display: flex; justify-content: center;">${actionBtn}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function processReturn(idx) {
+            const item = currentInv.items[idx];
+            const maxReturn = item.qty - (item.returnedQty || 0);
 
             Swal.fire({
-                title: `إرجاع للمورد (${item.name})`,
-                text: `الكمية المتاحة للإرجاع: ${remainingQty}`,
+                title: `استرجاع: ${item.name}`,
+                html: `
+                    <div style="text-align: right; font-size: 0.95rem; margin-bottom: 10px;">
+                        <p>🔄 المتبقي من الفاتورة للاسترجاع: <b style="color:var(--primary);">${maxReturn}</b></p>
+                    </div>
+                `,
                 input: 'number',
-                inputAttributes: { min: 1, max: remainingQty, step: 1 },
+                inputAttributes: { min: 1, max: maxReturn, step: 1 },
                 inputValue: 1,
                 showCancelButton: true,
-                confirmButtonText: 'تأكيد الإرجاع',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'تأكيد الاسترجاع',
                 cancelButtonText: 'إلغاء'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const returnQty = parseInt(result.value);
-                    if (isNaN(returnQty) || returnQty <= 0 || returnQty > remainingQty) {
-                        Swal.fire('خطأ', 'الكمية غير صحيحة', 'error');
-                        return;
+                    const qtyToReturn = parseInt(result.value);
+                    if (isNaN(qtyToReturn) || qtyToReturn <= 0 || qtyToReturn > maxReturn) {
+                        return Swal.fire('خطأ', 'الكمية المدخلة غير صحيحة!', 'error');
                     }
 
-                    const refundAmount = returnQty * item.cost;
-                    item.returnedQty = (item.returnedQty || 0) + returnQty;
-                    localStorage.setItem('pos_purchases', JSON.stringify(purchasesDB));
+                    const refundVal = qtyToReturn * (parseFloat(item.price) || 0);
 
-                    const supplier = contactsDB.find(c => c.id == currentInvoice.supplierId);
-                    if (supplier) {
-                        supplier.balance = (parseFloat(supplier.balance) || 0) + refundAmount;
-                        localStorage.setItem('pos_contacts', JSON.stringify(contactsDB));
+                    // أ. تحديث الفاتورة الأصلية (سجل المبيعات)
+                    item.returnedQty = (item.returnedQty || 0) + qtyToReturn;
+                    const invIndex = historyDB.findIndex(inv => inv.id === currentInv.id);
+                    historyDB[invIndex] = currentInv;
+                    localStorage.setItem('pos_history', JSON.stringify(historyDB));
+
+                    // ب. إرجاع الكمية إلى رصيد المعرض
+                    const productIndex = productsDB.findIndex(p => p.id == (item.code || item.id));
+                    if (productIndex > -1) {
+                        productsDB[productIndex].stock_showroom = (parseFloat(productsDB[productIndex].stock_showroom) || 0) + qtyToReturn;
+                        localStorage.setItem('pos_products', JSON.stringify(productsDB));
                     }
 
-                    const newReturnId = purchaseReturnsDB.length > 0 ? purchaseReturnsDB[purchaseReturnsDB.length - 1].id + 1 : 1;
-                    purchaseReturnsDB.push({
-                        id: newReturnId,
+                    // ج. تسجيل عملية المرتجع في السجل
+                    const returnEntry = {
+                        id: salesReturnsDB.length + 1,
+                        invoiceId: currentInv.id,
                         date: new Date().toLocaleString('ar-EG'),
-                        originalInvoiceId: currentInvoice.id,
-                        supplierName: supplier ? supplier.name : 'غير معروف',
-                        refundTotal: refundAmount,
-                        itemsReturned: `${item.name} (x${returnQty})`
-                    });
-                    localStorage.setItem('pos_purchases_returns', JSON.stringify(purchaseReturnsDB));
+                        customerName: currentInv.customer || "عميل طياري",
+                        items: `${item.name} (x${qtyToReturn})`,
+                        amount: refundVal
+                    };
+                    salesReturnsDB.push(returnEntry);
+                    localStorage.setItem('pos_sales_returns', JSON.stringify(salesReturnsDB));
 
-                    Swal.fire('تم!', `تم الإرجاع وخصم ${refundAmount.toFixed(2)} ج.م من مديونية المورد`, 'success');
-                    searchInvoice();
-                    renderReturnsLog();
+                    // د. تحديث رصيد العميل (لو الفاتورة مسجلة باسم عميل وعليه مديونية)
+                    if (currentInv.customer) {
+                        let customer = contactsDB.find(c => c.name === currentInv.customer && c.type === 'عميل');
+                        if (customer) {
+                            // رصيد العميل بالموجب معناه ديون عليه، الاسترجاع بيقلل ديونه
+                            customer.balance = (parseFloat(customer.balance) || 0) - refundVal;
+                            localStorage.setItem('pos_contacts', JSON.stringify(contactsDB));
+                        }
+                    }
+
+                    Swal.fire('نجاح', `تم استرجاع البضاعة وإضافتها للمعرض ورد قيمة ${refundVal.toFixed(2)} ج.م`, 'success');
+                    renderInvoiceItems();
+                    renderLog();
                 }
             });
         }
 
-        function renderReturnsLog() {
-            const tbody = document.getElementById('returnsTableBody');
-            if (purchaseReturnsDB.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 3rem; color: #94a3b8;">لا توجد مرتجعات مسجلة.</td></tr>';
+        function renderLog() {
+            const logBody = document.getElementById('returnsLogBody');
+            salesReturnsDB = JSON.parse(localStorage.getItem('pos_sales_returns')) || [];
+
+            if (salesReturnsDB.length === 0) {
+                logBody.innerHTML = '<tr><td colspan="5" style="color: var(--text-light); padding: 20px; text-align: center;">لا توجد مرتجعات مسجلة</td></tr>';
                 return;
             }
-            tbody.innerHTML = [...purchaseReturnsDB].reverse().map(ret => `
+
+            logBody.innerHTML = [...salesReturnsDB].reverse().map(ret => `
                 <tr>
-                    <td><span style="color: var(--warning); font-weight: 900;">#PR-${ret.id}</span></td>
-                    <td style="color: #64748b;">${ret.date}</td>
-                    <td style="font-weight: bold;">${ret.supplierName}</td>
-                    <td>${ret.itemsReturned}</td>
-                    <td style="color: var(--danger); font-weight: 900;">- ${ret.refundTotal.toFixed(2)} ج.م</td>
+                    <td style="font-weight: bold; color: var(--danger);">RET-${String(ret.id).padStart(4, '0')}</td>
+                    <td style="font-size: 0.85rem; color: var(--text-light);">${ret.date}</td>
+                    <td style="font-weight: 700;">${ret.customerName}</td>
+                    <td style="text-align: right; font-size: 0.9rem;">${ret.items} <br><small style="color: var(--primary);">فاتورة: INV-${String(ret.invoiceId).padStart(4, '0')}</small></td>
+                    <td style="color: var(--warning); font-weight: 900;">${(ret.amount || 0).toFixed(2)} ج.م</td>
                 </tr>
             `).join('');
         }
