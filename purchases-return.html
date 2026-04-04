@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مرتجع المشتريات - تك ستور</title>
+    <title>مرتجع المبيعات - تك ستور</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="navbar.css?v=6.0">
+    <link rel="stylesheet" href="navbar.css?v=13.0">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
@@ -30,10 +30,10 @@
             padding: 0;
         }
 
-        html,
-        body {
+        html, body {
             height: 100vh;
             overflow: hidden;
+            width: 100%;
         }
 
         body {
@@ -47,6 +47,7 @@
             flex: 1;
             height: 100vh;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 2rem;
             position: relative;
         }
@@ -82,6 +83,7 @@
             gap: 15px;
             margin-bottom: 20px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            align-items: center;
         }
 
         .search-box input {
@@ -108,6 +110,7 @@
             transition: 0.2s;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             font-size: 1rem;
         }
@@ -115,23 +118,13 @@
         .btn-search {
             background: var(--text);
             color: white;
+            height: 48px;
         }
 
-        .btn-search:hover {
-            background: #000;
-        }
-
-        .btn-return {
-            background: #fee2e2;
-            color: var(--danger);
-            font-size: 0.9rem;
-            padding: 8px 15px;
-        }
-
-        .btn-return:hover {
-            background: var(--danger);
-            color: white;
-        }
+        .btn-search:hover { background: #000; }
+        .btn-return { background: #fee2e2; color: var(--danger); font-size: 0.9rem; padding: 8px 15px; }
+        .btn-return:hover { background: var(--danger); color: white; }
+        .btn-disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; padding: 8px 15px; font-size: 0.95rem; border: 1px solid var(--border); }
 
         .erp-document {
             background: var(--panel);
@@ -153,9 +146,16 @@
             border: 1px dashed var(--border);
         }
 
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 750px;
         }
 
         th {
@@ -172,6 +172,67 @@
             text-align: center;
             font-weight: 600;
         }
+
+        tr:hover td { background-color: #f8fafc; }
+
+        /* =======================================================
+           📱 الميديا كويري (Responsive) القاضية
+           ======================================================= */
+        @media (max-width: 950px) {
+            html, body {
+                overflow-x: hidden !important; 
+                overflow-y: auto !important; 
+            }
+
+            .page-container {
+                padding: 80px 15px 20px 15px !important; 
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px;
+            }
+
+            /* 💡 إجبار مربع البحث والزرار تحت بعض بكامل العرض */
+            .search-box {
+                display: flex !important;
+                flex-direction: column !important; 
+                align-items: stretch !important; 
+                padding: 15px !important;
+                gap: 12px !important;
+            }
+
+            .search-box input {
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: none !important;
+            }
+
+            .search-box .btn-search {
+                width: 100% !important;
+                max-width: 100% !important;
+                justify-content: center !important;
+                margin: 0 !important;
+            }
+
+            /* 💡 إجبار الجداول على السكرول العرضي جوا البوكس بتاعها */
+            .erp-document {
+                padding: 15px !important;
+                width: 100% !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+
+            table {
+                min-width: 750px !important; 
+            }
+
+            .invoice-info-grid {
+                grid-template-columns: 1fr !important; 
+                gap: 10px !important;
+            }
+        }
     </style>
 </head>
 
@@ -182,55 +243,54 @@
     <div class="page-container">
         <div class="page-header">
             <h1 class="page-title">
-                <i class="bi bi-arrow-return-left" style="color: var(--warning);"></i>
-                مرتجع المشتريات
+                <i class="bi bi-arrow-return-left" style="color: var(--danger);"></i>
+                مرتجع المبيعات
             </h1>
         </div>
 
-        <!-- صندوق البحث -->
         <div class="search-box">
-            <input type="number" id="searchId" placeholder="🔍 أدخل رقم فاتورة الشراء للبحث..."
+            <input type="number" id="searchId" placeholder="🔍 أدخل رقم فاتورة المبيعات للبحث..."
                 onkeypress="if(event.key === 'Enter') searchInvoice()">
-            <button class="btn btn-search" onclick="searchInvoice()"><i class="bi bi-search"></i> بحث في
-                الفواتير</button>
+            <button class="btn btn-search" onclick="searchInvoice()"><i class="bi bi-search"></i> بحث في الفواتير</button>
         </div>
 
-        <!-- تفاصيل الفاتورة -->
         <div id="invoiceCard" class="erp-document" style="display:none;">
             <div class="invoice-info-grid">
                 <div>رقم الفاتورة: <b id="invIdDisplay" style="color: var(--primary); font-size: 1.1rem;">#0</b></div>
-                <div>المورد: <b id="supplierNameDisplay" style="color: var(--text);">--</b></div>
-                <div>وجهة الاستلام: <b id="warehouseDisplay" style="color: var(--info);">--</b></div>
+                <div>العميل: <b id="customerNameDisplay" style="color: var(--text);">--</b></div>
                 <div>التاريخ: <span id="invDateDisplay" style="color: var(--text-light);">--</span></div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="text-align: right;">الصنف</th>
-                        <th>سعر الشراء</th>
-                        <th>الكمية المستلمة</th>
-                        <th>تم إرجاعه</th>
-                        <th>الإجراء</th>
-                    </tr>
-                </thead>
-                <tbody id="invoiceItemsBody"></tbody>
-            </table>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: right;">الصنف</th>
+                            <th>سعر البيع</th>
+                            <th>الكمية المباعة</th>
+                            <th>تم إرجاعه</th>
+                            <th>الإجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceItemsBody"></tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- سجل المرتجعات -->
         <div class="erp-document">
-            <h3
-                style="margin-bottom: 15px; font-size: 1.2rem; border-bottom: 2px dashed var(--border); padding-bottom: 10px;">
-                📋 سجل المرتجعات السابقة</h3>
-            <div style="overflow-x: auto;">
+            <h3 style="margin-bottom: 15px; font-size: 1.2rem; border-bottom: 2px dashed var(--border); padding-bottom: 10px; color: var(--text);">
+                📋 سجل مرتجعات المبيعات السابقة
+            </h3>
+            
+            <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th>رقم المرتجع</th>
                             <th>التاريخ</th>
-                            <th>المورد</th>
-                            <th style="text-align: right;">المنتجات</th>
-                            <th>القيمة المستردة</th>
+                            <th>العميل</th>
+                            <th style="text-align: right;">المنتجات المستردة</th>
+                            <th>قيمة الاسترداد</th>
                         </tr>
                     </thead>
                     <tbody id="returnsLogBody"></tbody>
@@ -239,36 +299,67 @@
         </div>
     </div>
 
-    <script src="navbar.js?v=6.0"></script>
+    <script src="navbar.js?v=13.0"></script>
     <script>
-        let purchasesDB = JSON.parse(localStorage.getItem('pos_purchases')) || [];
-        let purchaseReturnsDB = JSON.parse(localStorage.getItem('pos_purchases_returns')) || [];
+        // 🛡️ كود الحماية (متاح للكاشير والأدمن)
+        const securityCheck = JSON.parse(localStorage.getItem('pos_current_user'));
+        if (!securityCheck) {
+            window.location.replace("login.html");
+        }
+
+        let historyDB = JSON.parse(localStorage.getItem('pos_history')) || [];
+        let salesReturnsDB = JSON.parse(localStorage.getItem('pos_sales_returns')) || [];
         let contactsDB = JSON.parse(localStorage.getItem('pos_contacts')) || [];
         let productsDB = JSON.parse(localStorage.getItem('pos_products')) || [];
         let currentInv = null;
+
+        window.onload = function () {
+            renderLog();
+
+            // 💡 رادار الناف بار عشان الأكورديون يفضل مفتوح على المبيعات
+            const checkNavbar = setInterval(() => {
+                const myLink = document.querySelector('a[href*="sales-return.html"]');
+                if (myLink) {
+                    clearInterval(checkNavbar);
+                    myLink.classList.add('active');
+                    const parentMenu = myLink.closest('.dropdown-menu') || myLink.closest('ul');
+                    if (parentMenu) {
+                        parentMenu.style.display = 'flex';
+                        parentMenu.style.flexDirection = 'column';
+                        parentMenu.style.visibility = 'visible';
+                        parentMenu.style.opacity = '1';
+                        parentMenu.classList.add('show', 'open', 'active');
+                        const parentItem = myLink.closest('.nav-item');
+                        if (parentItem) {
+                            parentItem.classList.add('open', 'active');
+                            const mainToggle = parentItem.querySelector('.nav-link');
+                            if (mainToggle) mainToggle.classList.add('active');
+                        }
+                    }
+                }
+            }, 100);
+        };
 
         function searchInvoice() {
             const id = parseInt(document.getElementById('searchId').value);
             if (!id) return;
 
-            // تحديث الداتا عشان لو في تعديلات حصلت في صفحات تانية
-            purchasesDB = JSON.parse(localStorage.getItem('pos_purchases')) || [];
+            // تحديث الداتا
+            historyDB = JSON.parse(localStorage.getItem('pos_history')) || [];
             contactsDB = JSON.parse(localStorage.getItem('pos_contacts')) || [];
             productsDB = JSON.parse(localStorage.getItem('pos_products')) || [];
 
-            currentInv = purchasesDB.find(inv => inv.id === id);
+            currentInv = historyDB.find(inv => inv.id === id);
 
             if (!currentInv) {
-                Swal.fire('خطأ', 'لم يتم العثور على فاتورة مشتريات بهذا الرقم', 'error');
+                Swal.fire('خطأ', 'لم يتم العثور على فاتورة مبيعات بهذا الرقم', 'error');
                 document.getElementById('invoiceCard').style.display = 'none';
                 return;
             }
 
-            const supplier = contactsDB.find(c => c.id == currentInv.supplierId);
-            document.getElementById('invIdDisplay').innerText = "PO-" + String(currentInv.id).padStart(4, '0');
-            document.getElementById('supplierNameDisplay').innerText = supplier ? supplier.name : "مورد عام";
+            document.getElementById('invIdDisplay').innerText = "INV-" + String(currentInv.id).padStart(4, '0');
+            document.getElementById('customerNameDisplay').innerText = currentInv.customer || "عميل طياري";
             document.getElementById('invDateDisplay').innerText = currentInv.date;
-            document.getElementById('warehouseDisplay').innerText = currentInv.warehouse || "المخزن الرئيسي";
 
             renderInvoiceItems();
             document.getElementById('invoiceCard').style.display = 'block';
@@ -281,8 +372,11 @@
                 const availableToReturn = item.qty - returnedQty;
 
                 let actionBtn = '';
-                if (availableToReturn > 0) {
-                    actionBtn = `<button class="btn btn-return" onclick="processReturn(${idx})"><i class="bi bi-box-arrow-up-right"></i> إرجاع</button>`;
+                // لو كان الصنف صيانة حرة مفيش ليه إرجاع مخزني
+                if(item.isRepair) {
+                    actionBtn = `<span style="color: #94a3b8; font-weight: bold;">خدمة صيانة</span>`;
+                } else if (availableToReturn > 0) {
+                    actionBtn = `<button class="btn btn-return" onclick="processReturn(${idx})"><i class="bi bi-arrow-return-right"></i> استرجاع</button>`;
                 } else {
                     actionBtn = `<span style="color: var(--success); font-weight: bold;"><i class="bi bi-check2-all"></i> تم الإرجاع بالكامل</span>`;
                 }
@@ -290,7 +384,7 @@
                 return `
                 <tr>
                     <td style="text-align: right; font-weight: 800; color: var(--primary-dark);">${item.name}</td>
-                    <td>${(parseFloat(item.cost) || 0).toFixed(2)} ج.م</td>
+                    <td>${(parseFloat(item.price) || 0).toFixed(2)} ج.م</td>
                     <td style="font-size: 1.1rem;">${item.qty}</td>
                     <td style="color: var(--danger); font-size: 1.1rem; font-weight: 900;">${returnedQty}</td>
                     <td style="display: flex; justify-content: center;">${actionBtn}</td>
@@ -302,86 +396,66 @@
         function processReturn(idx) {
             const item = currentInv.items[idx];
             const maxReturn = item.qty - (item.returnedQty || 0);
-            const targetWarehouse = currentInv.warehouse || "المخزن الرئيسي";
-
-            // 1. التحقق من الرصيد الفعلي في المخزن قبل الإرجاع
-            let currentStock = 0;
-            const productIndex = productsDB.findIndex(p => p.id == item.id);
-            if (productIndex > -1) {
-                if (targetWarehouse === 'المعرض') {
-                    currentStock = parseFloat(productsDB[productIndex].stock_showroom) || 0;
-                } else {
-                    currentStock = parseFloat(productsDB[productIndex].stock_main) || 0;
-                }
-            }
-
-            if (currentStock <= 0) {
-                return Swal.fire('خطأ في الرصيد', `لا يمكن إرجاع الصنف لأن رصيده الحالي في (${targetWarehouse}) يساوي صفر (تم بيعه أو نقله).`, 'error');
-            }
-
-            const allowedToReturn = Math.min(maxReturn, currentStock);
 
             Swal.fire({
-                title: `إرجاع: ${item.name}`,
+                title: `استرجاع: ${item.name}`,
                 html: `
                     <div style="text-align: right; font-size: 0.95rem; margin-bottom: 10px;">
-                        <p>📦 الرصيد المتوفر للخصم من ${targetWarehouse}: <b style="color:var(--danger);">${currentStock}</b></p>
-                        <p>🔄 المتبقي من الفاتورة: <b style="color:var(--primary);">${maxReturn}</b></p>
+                        <p>🔄 المتبقي من الفاتورة للاسترجاع: <b style="color:var(--primary);">${maxReturn}</b></p>
                     </div>
                 `,
                 input: 'number',
-                inputAttributes: { min: 1, max: allowedToReturn, step: 1 },
+                inputAttributes: { min: 1, max: maxReturn, step: 1 },
                 inputValue: 1,
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
-                confirmButtonText: 'تأكيد الإرجاع',
+                confirmButtonText: 'تأكيد الاسترجاع',
                 cancelButtonText: 'إلغاء'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const qtyToReturn = parseInt(result.value);
-                    if (isNaN(qtyToReturn) || qtyToReturn <= 0 || qtyToReturn > allowedToReturn) {
-                        return Swal.fire('خطأ', 'الكمية المدخلة غير صحيحة أو تتجاوز الرصيد المتاح!', 'error');
+                    if (isNaN(qtyToReturn) || qtyToReturn <= 0 || qtyToReturn > maxReturn) {
+                        return Swal.fire('خطأ', 'الكمية المدخلة غير صحيحة!', 'error');
                     }
 
-                    const refundVal = qtyToReturn * (parseFloat(item.cost) || 0);
+                    const refundVal = qtyToReturn * (parseFloat(item.price) || 0);
 
-                    // أ. تحديث الفاتورة الأصلية
+                    // أ. تحديث الفاتورة الأصلية (سجل المبيعات)
                     item.returnedQty = (item.returnedQty || 0) + qtyToReturn;
-                    const invIndex = purchasesDB.findIndex(inv => inv.id === currentInv.id);
-                    purchasesDB[invIndex] = currentInv;
-                    localStorage.setItem('pos_purchases', JSON.stringify(purchasesDB));
+                    const invIndex = historyDB.findIndex(inv => inv.id === currentInv.id);
+                    historyDB[invIndex] = currentInv;
+                    localStorage.setItem('pos_history', JSON.stringify(historyDB));
 
-                    // ب. خصم الكمية من المخزون الصحيح (اللوجيك الجديد)
+                    // ب. إرجاع الكمية إلى رصيد المعرض
+                    const productIndex = productsDB.findIndex(p => p.id == (item.code || item.id));
                     if (productIndex > -1) {
-                        if (targetWarehouse === 'المعرض') {
-                            productsDB[productIndex].stock_showroom -= qtyToReturn;
-                        } else {
-                            productsDB[productIndex].stock_main -= qtyToReturn;
-                        }
+                        productsDB[productIndex].stock_showroom = (parseFloat(productsDB[productIndex].stock_showroom) || 0) + qtyToReturn;
                         localStorage.setItem('pos_products', JSON.stringify(productsDB));
                     }
 
                     // ج. تسجيل عملية المرتجع في السجل
-                    const supplier = contactsDB.find(c => c.id == currentInv.supplierId);
                     const returnEntry = {
-                        id: purchaseReturnsDB.length + 1,
+                        id: salesReturnsDB.length + 1,
                         invoiceId: currentInv.id,
                         date: new Date().toLocaleString('ar-EG'),
-                        supplierName: supplier ? supplier.name : "مورد عام",
+                        customerName: currentInv.customer || "عميل طياري",
                         items: `${item.name} (x${qtyToReturn})`,
                         amount: refundVal
                     };
-                    purchaseReturnsDB.push(returnEntry);
-                    localStorage.setItem('pos_purchases_returns', JSON.stringify(purchaseReturnsDB));
+                    salesReturnsDB.push(returnEntry);
+                    localStorage.setItem('pos_sales_returns', JSON.stringify(salesReturnsDB));
 
-                    // د. تحديث رصيد المورد (تقليل المديونية)
-                    // المورد حسابه بالسالب (ديون علينا)، لما نرجعله بضاعة هنزود رصيده بالموجب (الديون تقل)
-                    if (supplier) {
-                        supplier.balance = (parseFloat(supplier.balance) || 0) + refundVal;
-                        localStorage.setItem('pos_contacts', JSON.stringify(contactsDB));
+                    // د. تحديث رصيد العميل (لو الفاتورة مسجلة باسم عميل وعليه مديونية)
+                    if (currentInv.customer) {
+                        let customer = contactsDB.find(c => c.name === currentInv.customer && c.type === 'عميل');
+                        if (customer) {
+                            // رصيد العميل بالموجب معناه ديون عليه، الاسترجاع بيقلل ديونه
+                            customer.balance = (parseFloat(customer.balance) || 0) - refundVal;
+                            localStorage.setItem('pos_contacts', JSON.stringify(contactsDB));
+                        }
                     }
 
-                    Swal.fire('نجاح', `تم خصم البضاعة من (${targetWarehouse}) وتقليل المديونية بقيمة ${refundVal} ج.م`, 'success');
+                    Swal.fire('نجاح', `تم استرجاع البضاعة وإضافتها للمعرض ورد قيمة ${refundVal.toFixed(2)} ج.م`, 'success');
                     renderInvoiceItems();
                     renderLog();
                 }
@@ -390,25 +464,23 @@
 
         function renderLog() {
             const logBody = document.getElementById('returnsLogBody');
-            purchaseReturnsDB = JSON.parse(localStorage.getItem('pos_purchases_returns')) || [];
+            salesReturnsDB = JSON.parse(localStorage.getItem('pos_sales_returns')) || [];
 
-            if (purchaseReturnsDB.length === 0) {
-                logBody.innerHTML = '<tr><td colspan="5" style="color: var(--text-light); padding: 20px;">لا توجد مرتجعات مسجلة</td></tr>';
+            if (salesReturnsDB.length === 0) {
+                logBody.innerHTML = '<tr><td colspan="5" style="color: var(--text-light); padding: 20px; text-align: center;">لا توجد مرتجعات مسجلة</td></tr>';
                 return;
             }
 
-            logBody.innerHTML = [...purchaseReturnsDB].reverse().map(ret => `
+            logBody.innerHTML = [...salesReturnsDB].reverse().map(ret => `
                 <tr>
-                    <td style="font-weight: bold; color: var(--warning);">RET-${String(ret.id).padStart(4, '0')}</td>
+                    <td style="font-weight: bold; color: var(--danger);">RET-${String(ret.id).padStart(4, '0')}</td>
                     <td style="font-size: 0.85rem; color: var(--text-light);">${ret.date}</td>
-                    <td style="font-weight: 700;">${ret.supplierName}</td>
-                    <td style="text-align: right; font-size: 0.9rem;">${ret.items} <br><small style="color: var(--primary);">فاتورة: PO-${String(ret.invoiceId).padStart(4, '0')}</small></td>
-                    <td style="color: var(--danger); font-weight: 900;">-${(ret.amount || 0).toFixed(2)} ج.م</td>
+                    <td style="font-weight: 700;">${ret.customerName}</td>
+                    <td style="text-align: right; font-size: 0.9rem;">${ret.items} <br><small style="color: var(--primary);">فاتورة: INV-${String(ret.invoiceId).padStart(4, '0')}</small></td>
+                    <td style="color: var(--warning); font-weight: 900;">${(ret.amount || 0).toFixed(2)} ج.م</td>
                 </tr>
             `).join('');
         }
-
-        window.onload = renderLog;
     </script>
 </body>
 
