@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل المبيعات - تك ستور</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="navbar.css?v=6.2">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg: #f3f4f6;
+            --panel: #ffffff;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            max-width: 100%;
+            overflow-x: hidden;
+            height: 100vh;
+            overflow-y: hidden;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: row;
+        }
+
+        .page-container {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .page-header {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 20px 25px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: white;
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: #f9fafb;
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: var(--danger);
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
+        .filter-card {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid var(--border);
+            background: #f9fafb;
+            color: var(--text);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .dashboard-row-top {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-row-bottom {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: right;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card i {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.9;
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text);
+        }
+
+        .stat-card.overall::before {
+            background: var(--text);
+        }
+
+        .stat-card.cash::before {
+            background: var(--success);
+        }
+
+        .stat-card.cash i,
+        .stat-card.cash .stat-value {
+            color: var(--success);
+        }
+
+        .stat-card.visa::before {
+            background: var(--info);
+        }
+
+        .stat-card.visa i,
+        .stat-card.visa .stat-value {
+            color: var(--info);
+        }
+
+        .stat-card.wallet::before {
+            background: var(--warning);
+        }
+
+        .stat-card.wallet i,
+        .stat-card.wallet .stat-value {
+            color: var(--warning);
+        }
+
+        .stat-card.credit::before {
+            background: var(--danger);
+        }
+
+        .stat-card.credit i,
+        .stat-card.credit .stat-value {
+            color: var(--danger);
+        }
+
+        .stat-card.returns {
+            background: #fee2e2;
+            cursor: pointer;
+        }
+
+        .stat-card.returns::before {
+            background: var(--danger);
+        }
+
+        .stat-card.returns i,
+        .stat-card.returns .stat-value {
+            color: var(--danger);
+        }
+
+        .stat-card.net {
+            background: #1e293b;
+            color: white;
+            border: none;
+        }
+
+        .stat-card.net::before {
+            background: var(--primary);
+        }
+
+        .stat-card.net i,
+        .stat-card.net .stat-value,
+        .stat-card.net .stat-title {
+            color: white;
+        }
+
+        .table-card {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .table-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--text-light);
+            padding: 12px;
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 0.95rem;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            font-family: monospace;
+            display: inline-block;
+        }
+
+        .badge-red {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .badge-green {
+            background: #dcfce7;
+            color: var(--success);
+        }
+
+        .badge-visa {
+            background: #e0f2fe;
+            color: var(--info);
+        }
+
+        .badge-wallet {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .badge-clear {
+            background: #dcfce7;
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: 0.2s;
+        }
+
+        .print-btn {
+            color: var(--info);
+        }
+
+        .print-btn:hover {
+            color: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(3px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border-top: 5px solid var(--danger);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #475569;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        @media screen {
+            #print-area {
+                display: none;
+            }
+        }
+
+        @media print {
+            @page {
+                margin: 0;
+                size: 80mm auto;
+            }
+
+            html,
+            body {
+                height: auto !important;
+                overflow: visible !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+
+            body>*:not(#print-area) {
+                display: none !important;
+            }
+
+            #print-area {
+                display: block !important;
+                width: 80mm !important;
+                max-width: 80mm !important;
+                margin: 0 auto;
+                padding: 2mm 4mm;
+                background: white;
+                direction: rtl;
+                overflow: hidden;
+                box-sizing: border-box;
+            }
+
+            #print-area * {
+                color: #000 !important;
+                font-family: 'Courier New', Courier, monospace, sans-serif !important;
+                font-weight: 700;
+            }
+
+            table {
+                table-layout: fixed;
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            hr {
+                border: none;
+                border-top: 1px dashed #000;
+                margin: 6px 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar-container"></div>
+
+    <main class="page-container">
+
+        <div class="page-header">
+            <h1 class="page-title"><i class="bi bi-receipt"></i> سجل المبيعات والطلبات</h1>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="window.print()"><i class="bi bi-printer"></i> طباعة
+                    السجل</button>
+                <button class="btn btn-danger admin-only" onclick="confirmClearHistory()"><i class="bi bi-trash"></i>
+                    مسح السجل</button>
+            </div>
+        </div>
+
+        <div class="filter-card">
+            <div class="form-group">
+                <label>من تاريخ:</label>
+                <input type="date" id="dateFrom" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>إلى تاريخ:</label>
+                <input type="date" id="dateTo" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>رقم الطلب / اسم العميل:</label>
+                <input type="text" id="searchInput" class="form-control" placeholder="بحث سريع...">
+            </div>
+            <button class="btn btn-primary" onclick="filterAndRender()"><i class="bi bi-search"></i> بحث</button>
+            <button class="btn btn-outline" onclick="resetFilter()"><i class="bi bi-arrow-clockwise"></i> تصفير</button>
+        </div>
+
+        <div class="dashboard-row-top">
+            <div class="stat-card overall">
+                <i class="bi bi-cart-check"></i>
+                <div class="stat-title">إجمالي المبيعات الفعلي</div>
+                <div class="stat-value" id="salesTotalBox">0.00</div>
+            </div>
+            <div class="stat-card cash">
+                <i class="bi bi-cash-stack"></i>
+                <div class="stat-title">المدفوع كاش (للدرج)</div>
+                <div class="stat-value" id="salesCashBox">0.00</div>
+            </div>
+            <div class="stat-card visa">
+                <i class="bi bi-credit-card-fill"></i>
+                <div class="stat-title">المدفوع فيزا</div>
+                <div class="stat-value" id="salesVisaBox">0.00</div>
+            </div>
+            <div class="stat-card wallet">
+                <i class="bi bi-phone-vibrate-fill"></i>
+                <div class="stat-title">المدفوع محافظ</div>
+                <div class="stat-value" id="salesWalletBox">0.00</div>
+            </div>
+        </div>
+
+        <div class="dashboard-row-bottom">
+            <div class="stat-card credit">
+                <i class="bi bi-calendar2-x"></i>
+                <div class="stat-title">الآجل المتبقي بالخارج (-)</div>
+                <div class="stat-value" id="salesCreditBox">0.00</div>
+            </div>
+            <div class="stat-card returns" onclick="window.location.href='sales-return.html'">
+                <i class="bi bi-arrow-return-left"></i>
+                <div class="stat-title">مرتجعات خرجت نقداً (-)</div>
+                <div class="stat-value" id="salesReturnsBox">0.00</div>
+            </div>
+            <div class="stat-card net">
+                <i class="bi bi-wallet2"></i>
+                <div class="stat-title">صافي الدرج الفعلي (كاش)</div>
+                <div class="stat-value" id="salesDrawerBox">0.00</div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-title">
+                <span><i class="bi bi-list-columns"></i> تفاصيل الفواتير</span>
+                <span style="font-size: 0.9rem; color: var(--text-light);" id="tableCountBadge">0 طلب</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="10%">رقم</th>
+                        <th width="15%">التاريخ</th>
+                        <th width="20%">العميل</th>
+                        <th width="15%">الإجمالي</th>
+                        <th width="15%">المدفوع (الطريقة)</th>
+                        <th width="15%">متبقي (آجل)</th>
+                        <th width="10%">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="print-area"></div>
+
+    <div id="customConfirm" class="modal-overlay">
+        <div class="modal-box">
+            <div style="font-size: 50px; margin-bottom: 15px; color: var(--danger);"><i
+                    class="bi bi-exclamation-triangle-fill"></i></div>
+            <h3 style="color: var(--text); margin-bottom: 10px;">تأكيد مسح السجل</h3>
+            <p style="color: var(--text-light); font-size: 0.95rem;">هل أنت متأكد من رغبتك في مسح جميع فواتير المبيعات
+                بشكل نهائي؟</p>
+            <div class="modal-buttons">
+                <button onclick="executeClearHistory()" class="btn-confirm">نعم، امسح السجل</button>
+                <button onclick="closeModal('customConfirm')" class="btn-cancel">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="navbar.js?v=6.2"></script>
+    <script>
+        let fullHistoryDB = [];
+        let dynHistory = [];
+        let fullPaymentsDB = []; // 💡 ضفنا قاعدة بيانات التحصيلات
+        let appSettings = JSON.parse(localStorage.getItem('pos_settings')) || { storeName: "تك ستور" };
+
+        window.onload = function () {
+            const userDataStr = localStorage.getItem('pos_current_user');
+            if (!userDataStr) { window.location.replace("login.html"); return; }
+            const userData = JSON.parse(userDataStr);
+            const currentRole = userData.role ? userData.role.trim().toLowerCase() : 'cashier';
+
+            if (currentRole === 'admin' || currentRole === 'أدمن') {
+                document.body.classList.add('is-admin');
+            } else {
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            }
+
+            fullHistoryDB = JSON.parse(localStorage.getItem('pos_history')) || [];
+            fullPaymentsDB = JSON.parse(localStorage.getItem('pos_payments')) || []; // 💡 تحميل التحصيلات
+
+            const today = new Date();
+            const todayFormatted = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            document.getElementById('dateFrom').value = todayFormatted;
+            document.getElementById('dateTo').value = todayFormatted;
+
+            prepareDynamicHistory();
+            filterAndRender();
+        };
+
+        function resetFilter() {
+            const today = new Date();
+            const todayFormatted = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            document.getElementById('dateFrom').value = todayFormatted;
+            document.getElementById('dateTo').value = todayFormatted;
+            document.getElementById('searchInput').value = '';
+            filterAndRender();
+        }
+
+        function parseDateSafely(dateStr) {
+            if (!dateStr) return new Date(0);
+            const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            let englishStr = String(dateStr).replace(/[٠-٩]/g, w => arabicNumbers.indexOf(w));
+            let cleanStr = englishStr.replace(/[\u200B-\u200D\uFEFF\u200E\u200F]/g, '');
+            let datePart = cleanStr.split(/[, ]+/)[0].trim();
+            let parts = datePart.split(/[\/\-]/);
+
+            if (parts.length >= 3) {
+                let p0 = parseInt(parts[0], 10);
+                let p1 = parseInt(parts[1], 10);
+                let p2 = parseInt(parts[2], 10);
+                let y = p2 > 1000 ? p2 : p0;
+                let m = p2 > 1000 ? p1 : p1;
+                let d = p2 > 1000 ? p0 : p2;
+                return new Date(y, m - 1, d);
+            }
+            return new Date(0);
+        }
+
+        // 💡 الخوارزمية العبقرية لتوزيع الدفعات
+        function prepareDynamicHistory() {
+            dynHistory = JSON.parse(JSON.stringify(fullHistoryDB));
+
+            // 1. تحديد الديون الأساسية لكل فاتورة
+            dynHistory.forEach(tx => {
+                let t = parseFloat(tx.total) || 0;
+                let p = tx.paid !== undefined ? parseFloat(tx.paid) : (String(tx.paymentMethod).includes('آجل') ? 0 : t);
+                tx.originalCash = p; // اللي ادفع وقت الفاتورة
+                tx.dynPaid = p;
+                tx.dynCredit = t - p; // الآجل المتبقي
+                tx.paymentMethod = tx.paymentMethod || 'كاش';
+                tx.totalRefunded = 0;
+            });
+
+            // 2. تجميع كل التحصيلات لكل عميل
+            let customerPayments = {};
+            fullPaymentsDB.forEach(p => {
+                if (p.type === 'تحصيل' && p.customerName) {
+                    if (!customerPayments[p.customerName]) customerPayments[p.customerName] = 0;
+                    customerPayments[p.customerName] += parseFloat(p.amount) || 0;
+                }
+            });
+
+            // 3. توزيع الدفعات دي على فواتيره الآجلة (من القديم للجديد)
+            Object.keys(customerPayments).forEach(cName => {
+                let paymentsLeft = customerPayments[cName];
+                let custOrders = dynHistory.filter(tx => tx.customer && tx.customer.trim() === cName && tx.dynCredit > 0);
+                custOrders.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // ترتيب من القديم للجديد
+
+                custOrders.forEach(tx => {
+                    if (paymentsLeft > 0 && tx.dynCredit > 0) {
+                        let payToThisOrder = Math.min(paymentsLeft, tx.dynCredit);
+                        tx.dynPaid += payToThisOrder; // الفاتورة اتسدد جزء منها نظرياً
+                        tx.dynCredit -= payToThisOrder; // الدين اللي عليها قل
+                        paymentsLeft -= payToThisOrder;
+                    }
+                });
+            });
+        }
+
+        function filterAndRender() {
+            let filteredHistory = [...dynHistory];
+            let filteredPayments = [...fullPaymentsDB];
+
+            const fromVal = document.getElementById('dateFrom').value;
+            const toVal = document.getElementById('dateTo').value;
+            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+
+            if (fromVal && toVal) {
+                const fromD = new Date(fromVal); fromD.setHours(0, 0, 0, 0);
+                const toD = new Date(toVal); toD.setHours(23, 59, 59, 999);
+
+                filteredHistory = filteredHistory.filter(tx => {
+                    const txDate = parseDateSafely(tx.date);
+                    return txDate >= fromD && txDate <= toD;
+                });
+
+                filteredPayments = filteredPayments.filter(p => {
+                    const pDate = parseDateSafely(p.date);
+                    return pDate >= fromD && pDate <= toD;
+                });
+            }
+
+            if (searchVal) {
+                filteredHistory = filteredHistory.filter(tx =>
+                    String(tx.id).includes(searchVal) ||
+                    (tx.customer && tx.customer.toLowerCase().includes(searchVal)) ||
+                    (tx.phone && tx.phone.includes(searchVal))
+                );
+            }
+
+            let tTotalOrders = 0, tCreditRemaining = 0, tCashPaid = 0, tVisaPaid = 0, tWalletPaid = 0, tCashReturns = 0;
+
+            // حساب اللي ادفع وقت عمل الفاتورة نفسها
+            filteredHistory.forEach(tx => {
+                tTotalOrders += parseFloat(tx.total) || 0;
+                tCreditRemaining += tx.dynCredit; // ده الآجل المتبقي الفعلي بعد توزيع الدفعات
+
+                let pAmt = tx.originalCash; // لاحظ بنحسب الـ originalCash عشان منجمعش الدفعات مرتين
+                if (tx.paymentMethod.includes('فيزا')) tVisaPaid += pAmt;
+                else if (tx.paymentMethod.includes('محفظة')) tWalletPaid += pAmt;
+                else tCashPaid += pAmt;
+            });
+
+            // 💡 إضافة التحصيلات (الدفعات) اللي اتعملت في فترة البحث دي للدرج
+            filteredPayments.forEach(p => {
+                if (p.type === 'تحصيل') {
+                    let amt = parseFloat(p.amount) || 0;
+                    if (p.method === 'فيزا') tVisaPaid += amt;
+                    else if (p.method === 'محفظة') tWalletPaid += amt;
+                    else tCashPaid += amt;
+                }
+            });
+
+            let tExpenses = 0;
+            let netDrawer = tCashPaid - tCashReturns - tExpenses;
+
+            document.getElementById('salesTotalBox').innerText = tTotalOrders.toFixed(2);
+            document.getElementById('salesCashBox').innerText = tCashPaid.toFixed(2);
+            document.getElementById('salesVisaBox').innerText = tVisaPaid.toFixed(2);
+            document.getElementById('salesWalletBox').innerText = tWalletPaid.toFixed(2);
+            document.getElementById('salesCreditBox').innerText = tCreditRemaining.toFixed(2);
+            document.getElementById('salesReturnsBox').innerText = tCashReturns.toFixed(2);
+            document.getElementById('salesDrawerBox').innerText = netDrawer.toFixed(2);
+            document.getElementById('tableCountBadge').innerText = `${filteredHistory.length} طلب`;
+
+            renderTable(filteredHistory);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('salesTableBody');
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="padding: 3rem; color: var(--text-light); text-align:center;"><i class="bi bi-folder-x" style="font-size:2rem; display:block; margin-bottom:10px;"></i> لا توجد فواتير مطابقة للبحث.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = [...data].reverse().map(tx => {
+                let custText = tx.customer ? tx.customer : '<span style="color:var(--text-light);">عميل نقدي</span>';
+                let total = parseFloat(tx.total) || 0;
+                let cash = tx.dynPaid || 0; // دي الفلوس اللي ادفعت سواء وقت الفاتورة أو دفعات لاحقة
+                let credit = tx.dynCredit || 0;
+
+                let creditHtml = credit <= 0.01 ? `<span class="badge badge-clear">خالص 🟢</span>` : `<span class="badge badge-red">${credit.toFixed(2)}</span>`;
+
+                let payBadge = `<span class="badge badge-green">💵 كاش</span>`;
+                if (tx.paymentMethod.includes('فيزا')) payBadge = `<span class="badge badge-visa">💳 فيزا</span>`;
+                else if (tx.paymentMethod.includes('محفظة')) payBadge = `<span class="badge badge-wallet">📱 محفظة</span>`;
+                else if (tx.paymentMethod === 'آجل بالكامل') payBadge = `<span class="badge badge-red">آجل</span>`;
+
+                return `
+                <tr>
+                    <td style="color:var(--primary-dark); font-weight:900; font-size:1.1rem;">#${tx.id}</td>
+                    <td style="font-size:0.85rem; color:var(--text-light);">${tx.date}</td>
+                    <td style="font-weight: bold;">${custText}</td>
+                    <td style="font-weight:900; font-size:1.1rem;">${total.toFixed(2)}</td>
+                    <td>
+                        <div style="font-weight:bold; margin-bottom:4px;">${cash.toFixed(2)}</div>
+                        ${payBadge}
+                    </td>
+                    <td>${creditHtml}</td>
+                    <td>
+                        <div style="display:flex; justify-content:center; gap:5px;">
+                            <button class="action-btn print-btn" onclick="printOldReceipt(${tx.id})" title="طباعة الفاتورة"><i class="bi bi-printer"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function printOldReceipt(id) {
+            const tx = dynHistory.find(t => String(t.id) === String(id));
+            if (!tx) return alert("الطلب غير موجود!");
+
+            let itemsHtml = tx.items.map(i => `
+                <tr>
+                    <td style="text-align: right; padding: 4px 0; font-size: 0.85rem; width: 50%;">${i.name}</td>
+                    <td style="text-align: center; padding: 4px 0; font-size: 0.85rem; width: 20%;">${i.qty}</td>
+                    <td style="text-align: left; padding: 4px 0; font-size: 0.85rem; width: 30%;">${(i.price * i.qty).toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            let receiptHTML = `
+            <div style="direction: rtl; width: 100%;">
+                <div style="text-align: center; border: 1px solid #000; padding: 3px; font-weight: bold; margin-bottom: 5px; font-size: 0.85rem;">نسخة مطبوعة من السجل</div>
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <h2 style="margin: 0; font-size: 1.5rem; font-weight: 900; font-family: 'Cairo', sans-serif;">${appSettings.storeName}</h2>
+                </div>
+                <hr>
+                <div style="font-size: 0.9rem; margin-bottom: 10px; line-height: 1.6;">
+                    <div style="display: flex; justify-content: space-between;"><span>رقم الفاتورة:</span><span style="font-weight:900; font-size:1.1rem;">${tx.id}</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>التاريخ:</span><span>${tx.date}</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>طريقة الدفع:</span><span style="font-weight:900;">${tx.paymentMethod}</span></div>
+                    ${tx.customer ? `<div style="display: flex; justify-content: space-between;"><span>العميل:</span><span>${tx.customer}</span></div>` : ''}
+                </div>
+                <hr>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px; table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th style="border-bottom: 1px dashed #000; padding: 4px 0; text-align: right; font-size: 0.85rem; width: 50%;">الصنف</th>
+                            <th style="border-bottom: 1px dashed #000; padding: 4px 0; text-align: center; font-size: 0.85rem; width: 20%;">العدد</th>
+                            <th style="border-bottom: 1px dashed #000; padding: 4px 0; text-align: left; font-size: 0.85rem; width: 30%;">الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>${itemsHtml}</tbody>
+                </table>
+                <hr>
+                <div style="margin-bottom: 10px; font-size: 0.9rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 900; margin-top: 5px;"><span>الصافي:</span><span>${(tx.total || 0).toFixed(2)}</span></div>
+                </div>
+                <p style="text-align:center; font-size: 0.8rem; margin-top: 15px;">شكراً لزيارتكم!</p>
+            </div>`;
+
+            document.getElementById('print-area').innerHTML = receiptHTML;
+            setTimeout(() => { window.print(); }, 150);
+        }
+
+        function confirmClearHistory() {
+            Swal.fire({
+                title: 'تأكيد مسح السجل',
+                text: "هل أنت متأكد من رغبتك في مسح جميع فواتير المبيعات بشكل نهائي؟ (هذا الإجراء لا يمكن التراجع عنه)",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'نعم، امسح السجل',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fullHistoryDB = [];
+                    localStorage.setItem('pos_history', JSON.stringify([]));
+                    prepareDynamicHistory();
+                    filterAndRender();
+                    Swal.fire('تم المسح!', 'تم مسح سجل المبيعات بنجاح.', 'success');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

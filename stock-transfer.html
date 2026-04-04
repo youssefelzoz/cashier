@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحويل مخزني - تك ستور</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="navbar.css?v=10.2">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            /* أزرق للتحويل */
+            --primary-dark: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f3f4f6;
+            --panel: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --warning: #f59e0b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 💡 الفردة بتاعة الشاشة */
+        html,
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: row;
+        }
+
+        .page-container {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* --- Header --- */
+        .page-header {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 20px 25px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Cairo';
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-blue {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-blue:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* --- Cards & Forms --- */
+        .card {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            border-top: 5px solid var(--primary);
+        }
+
+        .transfer-section {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .transfer-section {
+                flex-direction: column;
+            }
+
+            .transfer-arrow {
+                display: none !important;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            font-family: 'Cairo';
+            background: #f8fafc;
+            color: var(--text);
+            font-weight: bold;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .transfer-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--border);
+            margin-top: 30px;
+        }
+
+        /* --- Search & Table --- */
+        .search-area {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        #searchResults {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            z-index: 1000;
+            border-radius: 0 0 8px 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .search-item:hover {
+            background: #eff6ff;
+            color: var(--primary);
+            padding-right: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: var(--text-light);
+            padding: 15px;
+            text-align: right;
+            border-bottom: 2px solid var(--border);
+            font-size: 1rem;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f8fafc;
+            vertical-align: middle;
+            font-weight: bold;
+        }
+
+        .qty-input {
+            width: 120px;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Cairo';
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--primary);
+            background: #eff6ff;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .qty-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar-container"></div>
+
+    <div class="page-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title"><i class="bi bi-arrow-left-right" style="color: var(--primary);"></i> أمر تحويل
+                    مخزني</h1>
+                <p style="color: var(--text-light); margin: 5px 0 0; font-weight: bold;">نقل البضاعة بين المخزن الرئيسي
+                    والمعرض بدون تأثير مالي.</p>
+            </div>
+            <button class="btn btn-blue" onclick="saveStockTransfer()"><i class="bi bi-check2-all"></i> اعتماد
+                التحويل</button>
+        </div>
+
+        <div class="card">
+            <div class="transfer-section">
+                <div class="form-group">
+                    <label style="color: var(--danger);"><i class="bi bi-box-arrow-up"></i> يُخصم من (المُرسِل): <span
+                            style="color:red">*</span></label>
+                    <select id="fromLocation" class="form-control" style="border-color: #fca5a5; background: #fef2f2;">
+                        <option value="المخزن الرئيسي">المخزن الرئيسي (البدروم)</option>
+                        <option value="المعرض">المعرض (صالة البيع)</option>
+                    </select>
+                </div>
+
+                <div class="transfer-arrow"><i class="bi bi-arrow-left-circle-fill" style="color: var(--primary);"></i>
+                </div>
+
+                <div class="form-group">
+                    <label style="color: var(--success);"><i class="bi bi-box-arrow-in-down"></i> يُضاف إلى
+                        (المُستقبِل): <span style="color:red">*</span></label>
+                    <select id="toLocation" class="form-control" style="border-color: #86efac; background: #f0fdf4;">
+                        <option value="المعرض" selected>المعرض (صالة البيع)</option>
+                        <option value="المخزن الرئيسي">المخزن الرئيسي (البدروم)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label>تاريخ التحويل:</label>
+                    <input type="date" id="docDate" class="form-control">
+                </div>
+                <div class="form-group" style="flex: 2; min-width: 250px;">
+                    <label>ملاحظات إضافية (أو اسم المستلم):</label>
+                    <input type="text" id="notes" class="form-control"
+                        placeholder="مثال: تم النقل لسد العجز في المعرض...">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3
+                style="margin-top: 0; color: var(--text); border-bottom: 2px dashed var(--border); padding-bottom: 10px;">
+                📦 الأصناف المراد نقلها
+            </h3>
+
+            <div class="search-area">
+                <input type="text" id="productSearch" class="form-control"
+                    placeholder="🔍 ابحث عن صنف لنقله (بالكود أو الاسم)..." autocomplete="off">
+                <div id="searchResults"></div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table id="itemsTable">
+                    <thead>
+                        <tr>
+                            <th width="15%">الكود</th>
+                            <th width="45%">اسم الصنف</th>
+                            <th width="30%" style="text-align: center;">الكمية المحولة (نقل)</th>
+                            <th width="10%" style="text-align: center;">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="documentItemsBody">
+                        <tr id="emptyRow">
+                            <td colspan="4"
+                                style="text-align:center; color:var(--text-light); padding: 3rem; font-size: 1.1rem;">
+                                <i class="bi bi-box-seam"
+                                    style="font-size: 2.5rem; display: block; margin-bottom: 10px;"></i>
+                                لم يتم إدراج أصناف للتحويل بعد.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="navbar.js?v=10.2"></script>
+    <script>
+        // 🛡️ كود الحماية
+        const securityCheck = JSON.parse(localStorage.getItem('pos_current_user'));
+        if (!securityCheck || (securityCheck.role !== 'admin' && securityCheck.role !== 'أدمن')) {
+            alert("⛔ غير مصرح لك بالدخول لهذه الصفحة!");
+            window.location.replace("index.html");
+        }
+
+        // 1. 💡 سحب قاعدة البيانات الحقيقية
+        let productsDB = JSON.parse(localStorage.getItem('pos_products')) || [];
+        let stockDocsDB = JSON.parse(localStorage.getItem('pos_stock_docs')) || [];
+        let docItems = [];
+
+        window.onload = function () {
+            document.getElementById('docDate').value = new Date().toISOString().split('T')[0];
+        };
+
+        // 2. نظام البحث
+        const searchInput = document.getElementById('productSearch');
+        const searchResults = document.getElementById('searchResults');
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.trim().toLowerCase();
+            if (!term) { searchResults.style.display = 'none'; return; }
+
+            const matches = productsDB.filter(p => p.name.toLowerCase().includes(term) || String(p.id).includes(term));
+
+            if (matches.length > 0) {
+                searchResults.innerHTML = matches.map(p => `
+                    <div class="search-item" onclick="addItem('${p.id}')">
+                        <span><strong style="color:var(--primary)">[${p.id}]</strong> ${p.name}</span>
+                        <span style="color: var(--primary); font-size: 1.2rem;"><i class="bi bi-arrow-repeat"></i></span>
+                    </div>
+                `).join('');
+                searchResults.style.display = 'block';
+            } else { searchResults.style.display = 'none'; }
+        });
+
+        document.addEventListener('click', (e) => { if (!searchInput.contains(e.target)) searchResults.style.display = 'none'; });
+
+        // 3. إضافة الصنف للجدول
+        function addItem(code) {
+            const product = productsDB.find(p => String(p.id) === String(code));
+            if (product) {
+                const existing = docItems.find(i => String(i.code) === String(code));
+                if (existing) {
+                    existing.qty += 1;
+                } else {
+                    docItems.push({ code: product.id, name: product.name, qty: 1 });
+                }
+                renderTable();
+            }
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+        }
+
+        // 4. تحديث الكميات في الجدول (بدون فوكس ضائع 💡)
+        function updateQty(index, value) {
+            let val = parseInt(value);
+            if (isNaN(val) || val < 1) val = 1;
+            docItems[index].qty = val;
+        }
+
+        function removeItem(index) {
+            docItems.splice(index, 1);
+            renderTable();
+        }
+
+        // 5. رسم الجدول
+        function renderTable() {
+            const tbody = document.getElementById('documentItemsBody');
+            if (docItems.length === 0) {
+                tbody.innerHTML = `
+                <tr id="emptyRow">
+                    <td colspan="4" style="text-align:center; color:var(--text-light); padding: 3rem; font-size: 1.1rem;">
+                        <i class="bi bi-box-seam" style="font-size: 2.5rem; display: block; margin-bottom: 10px;"></i>
+                        لم يتم إدراج أصناف للتحويل بعد.
+                    </td>
+                </tr>`;
+            } else {
+                tbody.innerHTML = docItems.map((item, index) => `
+                    <tr>
+                        <td style="color: var(--text-light); font-weight: 900;">${item.code}</td>
+                        <td style="font-size: 1.1rem; color: var(--text);">${item.name}</td>
+                        <td style="text-align: center;">
+                            <input type="number" class="qty-input" value="${item.qty}" min="1" oninput="updateQty(${index}, this.value)">
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="action-btn" onclick="removeItem(${index})" title="حذف الصنف"><i class="bi bi-trash3-fill"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // 6. حفظ الإذن وخصم/إضافة الرصيد الفعلي 🚀
+        function saveStockTransfer() {
+            const fromLoc = document.getElementById('fromLocation').value;
+            const toLoc = document.getElementById('toLocation').value;
+
+            if (fromLoc === toLoc) return Swal.fire('خطأ', 'لا يمكن التحويل لنفس المخزن! الرجاء تغيير الوجهة.', 'error');
+            if (docItems.length === 0) return Swal.fire('تنبيه', 'لا يمكن حفظ أمر فارغ! الرجاء إضافة أصناف.', 'warning');
+
+            const date = document.getElementById('docDate').value;
+            const notes = document.getElementById('notes').value.trim();
+
+            Swal.fire({
+                title: 'تأكيد التحويل',
+                text: `سيتم نقل البضاعة من (${fromLoc}) إلى (${toLoc}). هل أنت متأكد؟`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3b82f6',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'نعم، اعتمد النقل',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    // 💡 السر هنا: اللوجيك المزدوج (طرح من الأول وجمع في التاني)
+                    docItems.forEach(item => {
+                        let pIndex = productsDB.findIndex(p => String(p.id) === String(item.code));
+                        if (pIndex > -1) {
+                            // 1. الخصم من المُرسِل
+                            if (fromLoc === 'المعرض') {
+                                productsDB[pIndex].stock_showroom = Math.max(0, (parseFloat(productsDB[pIndex].stock_showroom) || 0) - item.qty);
+                            } else {
+                                productsDB[pIndex].stock_main = Math.max(0, (parseFloat(productsDB[pIndex].stock_main) || 0) - item.qty);
+                            }
+
+                            // 2. الإضافة للمُستقبِل
+                            if (toLoc === 'المعرض') {
+                                productsDB[pIndex].stock_showroom = (parseFloat(productsDB[pIndex].stock_showroom) || 0) + item.qty;
+                            } else {
+                                productsDB[pIndex].stock_main = (parseFloat(productsDB[pIndex].stock_main) || 0) + item.qty;
+                            }
+                        }
+                    });
+
+                    localStorage.setItem('pos_products', JSON.stringify(productsDB));
+
+                    const newId = stockDocsDB.length > 0 ? stockDocsDB[stockDocsDB.length - 1].id + 1 : 1;
+                    const documentData = {
+                        id: newId,
+                        type: 'تحويل', // يميز إنه حركة مزدوجة
+                        date: new Date(date).toLocaleString('ar-EG'),
+                        fromLocation: fromLoc,
+                        toLocation: toLoc,
+                        notes: notes,
+                        items: [...docItems],
+                        user: securityCheck.name || 'أدمن'
+                    };
+
+                    stockDocsDB.push(documentData);
+                    localStorage.setItem('pos_stock_docs', JSON.stringify(stockDocsDB));
+
+                    Swal.fire('تم النقل!', `تم اعتماد التحويل رقم #${newId} وتحديث الأرصدة بنجاح.`, 'success')
+                        .then(() => window.location.reload());
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

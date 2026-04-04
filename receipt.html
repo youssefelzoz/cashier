@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سند قبض نقدية - Smart ERP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="navbar.css?v=8.3">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #10b981;
+            /* أخضر للقبض */
+            --primary-dark: #059669;
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --text: #1e293b;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+            --blue: #3b82f6;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 💡 السطر اللي اتعدل لحل مشكلة المساحة البيضاء */
+        html,
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: row;
+        }
+
+        .page-container {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .voucher-card {
+            background: var(--panel);
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border-top: 8px solid var(--primary);
+        }
+
+        .voucher-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--border);
+            padding-bottom: 20px;
+        }
+
+        .voucher-header h1 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .voucher-header p {
+            margin: 5px 0 0;
+            color: #64748b;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #475569;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-family: 'Cairo';
+            outline: none;
+            transition: 0.3s;
+            background: #f8fafc;
+            color: var(--text);
+            font-weight: bold;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .amount-input-wrapper {
+            position: relative;
+        }
+
+        .amount-input-wrapper input {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary);
+            padding-left: 60px;
+            height: 70px;
+        }
+
+        .amount-input-wrapper span {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #94a3b8;
+        }
+
+        .balance-info {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+            border: 1px dashed var(--border);
+        }
+
+        .balance-info.active {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 💡 طرق الدفع */
+        .pay-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .pay-methods input[type="radio"] {
+            display: none;
+        }
+
+        .pay-methods label {
+            text-align: center;
+            border: 2px solid var(--border);
+            padding: 12px 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #64748b;
+            transition: 0.2s;
+            background: #f8fafc;
+            font-size: 0.95rem;
+        }
+
+        .pay-methods input[type="radio"]:checked+label {
+            border-color: var(--primary);
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Cairo';
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar-container"></div>
+
+    <main class="page-container">
+        <div class="voucher-card">
+            <div class="voucher-header">
+                <h1><i class="bi bi-wallet2"></i> سند قبض نقدية</h1>
+                <p>إثبات دخول نقدية للخزينة (سداد عملاء أو إيرادات أخرى)</p>
+            </div>
+
+            <div class="form-group">
+                <label>التاريخ:</label>
+                <input type="date" id="voucherDate" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>الجهة الدافعة (استلمنا من): <span style="color:red">*</span></label>
+                <select id="contactSelect" class="form-control" onchange="showBalance()">
+                    <option value="general">💼 إيرادات أخرى (بدون جهة محددة)</option>
+                    <optgroup label="العملاء والموردين" id="contactsGroup"></optgroup>
+                </select>
+
+                <div id="balanceInfo" class="balance-info">
+                    <span style="color: #64748b; font-weight: bold;">الرصيد الحالي للجهة:</span>
+                    <span id="currentBalance" style="font-size: 1.2rem; font-weight: 900; direction: ltr;">0.00</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>المبلغ المستلم: <span style="color:red">*</span></label>
+                <div class="amount-input-wrapper">
+                    <input type="number" id="amount" class="form-control" placeholder="0.00" min="1">
+                    <span>ج.م</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>أين تم إيداع المبلغ؟ (طريقة الدفع): <span style="color:red">*</span></label>
+                <div class="pay-methods">
+                    <input type="radio" name="payMethod" id="pmCash" value="كاش" checked>
+                    <label for="pmCash">💵 كاش (في الدرج)</label>
+                    <input type="radio" name="payMethod" id="pmVisa" value="فيزا">
+                    <label for="pmVisa">💳 فيزا (للبنك)</label>
+                    <input type="radio" name="payMethod" id="pmWallet" value="محفظة">
+                    <label for="pmWallet">📱 محفظة إلكترونية</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>البيان / ملاحظات (سبب الاستلام): <span style="color:red">*</span></label>
+                <input type="text" id="notes" class="form-control"
+                    placeholder="مثال: سداد دفعة من الحساب، إيراد خارجي...">
+            </div>
+
+            <button class="btn btn-primary" onclick="saveVoucher()"><i class="bi bi-check-circle-fill"></i> اعتماد القبض
+                وتحديث الرصيد</button>
+        </div>
+    </main>
+
+    <script src="navbar.js?v=8.3"></script>
+    <script>
+        // 🛡️ كود الحماية
+        let currentUser = JSON.parse(localStorage.getItem('pos_current_user'));
+        if (!currentUser) {
+            window.location.replace("login.html");
+        } else {
+            const role = currentUser.role ? currentUser.role.trim().toLowerCase() : 'cashier';
+            if (role !== 'admin' && role !== 'أدمن') {
+                Swal.fire({ icon: 'error', title: 'مرفوض', text: 'غير مصرح لك بدخول هذه الصفحة' }).then(() => {
+                    window.location.replace("index.html");
+                });
+            }
+        }
+
+        // 💡 بنقرا الداتا الصح
+        let contactsDB = JSON.parse(localStorage.getItem('pos_contacts')) || [];
+        let paymentsDB = JSON.parse(localStorage.getItem('pos_payments')) || []; // ده اللي بيسمع في الخزنة
+
+        window.onload = function () {
+            document.getElementById('voucherDate').value = new Date().toISOString().split('T')[0];
+
+            const group = document.getElementById('contactsGroup');
+            // ترتيب العملاء في الأول لأن هما اللي بيدفعوا أكتر
+            contactsDB.sort((a, b) => b.type.localeCompare(a.type)).forEach(c => {
+                group.innerHTML += `<option value="${c.id}">${c.name} (${c.type})</option>`;
+            });
+        };
+
+        function showBalance() {
+            const contactId = document.getElementById('contactSelect').value;
+            const balanceBox = document.getElementById('balanceInfo');
+            const balanceText = document.getElementById('currentBalance');
+
+            if (contactId && contactId !== 'general') {
+                const contact = contactsDB.find(c => c.id == contactId);
+                let balance = parseFloat(contact.balance) || 0;
+
+                // لو الرصيد موجب (عليه فلوس لينا) نخليه أخضر، لو سالب نخليه أحمر
+                if (balance > 0) {
+                    balanceText.innerText = balance.toFixed(2) + " ج.م (عليه)";
+                    balanceText.style.color = "var(--primary)";
+                } else if (balance < 0) {
+                    balanceText.innerText = Math.abs(balance).toFixed(2) + " ج.م (له)";
+                    balanceText.style.color = "var(--danger)";
+                } else {
+                    balanceText.innerText = "0.00 (خالص)";
+                    balanceText.style.color = "var(--text)";
+                }
+                balanceBox.classList.add('active');
+            } else {
+                balanceBox.classList.remove('active');
+            }
+        }
+
+        function saveVoucher() {
+            const contactId = document.getElementById('contactSelect').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const notes = document.getElementById('notes').value.trim();
+            const date = document.getElementById('voucherDate').value;
+            const method = document.querySelector('input[name="payMethod"]:checked').value;
+
+            if (!amount || amount <= 0) return Swal.fire('تنبيه', 'الرجاء إدخال مبلغ صحيح أكبر من الصفر!', 'warning');
+            if (!notes) return Swal.fire('تنبيه', 'الرجاء كتابة البيان أو سبب الاستلام!', 'warning');
+
+            let contactName = 'بدون جهة';
+            let contactType = 'عام';
+
+            // 1. تحديث رصيد العميل 💡
+            if (contactId !== 'general') {
+                const index = contactsDB.findIndex(c => c.id == contactId);
+                if (index > -1) {
+                    // القبض بيقلل مديونية العميل اللي عليه (يعني لو عليه 1000، دفع 400، يبقى عليه 600)
+                    contactsDB[index].balance = (parseFloat(contactsDB[index].balance) || 0) - amount;
+                    localStorage.setItem('pos_contacts', JSON.stringify(contactsDB));
+
+                    contactName = contactsDB[index].name;
+                    contactType = contactsDB[index].type;
+                }
+            }
+
+            // 2. تسجيل السند في جدول الـ Payments عشان يسمع في الدرج والسندات 💡
+            const newId = paymentsDB.length > 0 ? paymentsDB[paymentsDB.length - 1].id + 1 : 1;
+            let formattedDate = new Date(date).toLocaleString('ar-EG');
+
+            const paymentEntry = {
+                id: newId,
+                date: formattedDate,
+                contactId: contactId === 'general' ? null : contactId,
+                customerName: contactName,
+                contactType: contactType,
+                type: 'تحصيل', // الكلمة دي هي اللي بتعرف شاشة المبيعات إن ده إيراد
+                amount: amount,
+                method: method,
+                notes: notes,
+                cashier: currentUser ? currentUser.name : 'أدمن'
+            };
+
+            paymentsDB.push(paymentEntry);
+            localStorage.setItem('pos_payments', JSON.stringify(paymentsDB));
+
+            Swal.fire({
+                title: 'تم القبض!',
+                text: `تم استلام مبلغ ${amount} ج.م بنجاح عبر (${method}).`,
+                icon: 'success',
+                confirmButtonText: 'حسناً',
+                confirmButtonColor: '#10b981'
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - Smart ERP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- سطر استدعاء الأيقونات - لازم يكون موجود في كل صفحة -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            /* خلفية متدرجة شيك جداً */
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .login-wrapper {
+            background: var(--panel);
+            width: 100%;
+            max-width: 450px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 40px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-area {
+            margin-bottom: 30px;
+        }
+
+        .logo-area h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo-area p {
+            color: #64748b;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
+            background-color: #f8fafc;
+            direction: ltr;
+            /* عشان الانجليزي يتكتب صح */
+            text-align: right;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-login:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .error-msg {
+            color: #ef4444;
+            background: #fee2e2;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        /* تلميحات تجريبية عشانك */
+        .demo-credentials {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed var(--border);
+            text-align: right;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .demo-credentials h4 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .demo-credentials ul {
+            list-style: none;
+        }
+
+        .demo-credentials li {
+            margin-bottom: 5px;
+            background: #f1f5f9;
+            padding: 5px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .demo-credentials strong {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-wrapper">
+        <div class="logo-area">
+            <h1>🛒 AL YAMEN</h1>
+            <p>سجل الدخول للمتابعة إلى النظام</p>
+        </div>
+
+        <div id="errorMsg" class="error-msg">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>اسم المستخدم (Username)</label>
+                <input type="text" id="username" class="form-control" placeholder="أدخل اسم المستخدم" required
+                    autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label>كلمة المرور (Password)</label>
+                <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-login">دخول 🚀</button>
+        </form>
+
+        <div class="demo-credentials">
+            <h4>حسابات للتجربة (Demo):</h4>
+            <ul>
+                <li>مدير النظام: اليوزر <strong>admin</strong> | الباسورد <strong>123</strong></li>
+                <li>كاشير مبيعات: اليوزر <strong>cashier</strong> | الباسورد <strong>123</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // دالة تسجيل الدخول
+        function handleLogin(event) {
+            event.preventDefault(); // التعديل هنا: كتبناها event كاملة عشان تفصل الـ Refresh
+
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const errorBox = document.getElementById('errorMsg');
+
+            if (user === 'admin' && pass === '123') {
+                const currentUser = { name: "أدمن", role: "admin" };
+                localStorage.setItem('pos_current_user', JSON.stringify(currentUser));
+                window.location.href = "index.html"; // خليت الأدمن يدخل عالكاشير برضه للتجربة
+            }
+            else if (user === 'cashier' && pass === '123') {
+                const currentUser = { name: "كاشير", role: "cashier" };
+                localStorage.setItem('pos_current_user', JSON.stringify(currentUser));
+                window.location.href = "index.html";
+            }
+            else {
+                errorBox.style.display = 'block';
+                setTimeout(() => { errorBox.style.display = 'none'; }, 3000);
+            }
+        }
+
+        window.onload = function () {
+            const loggedIn = localStorage.getItem('pos_current_user');
+            if (loggedIn) {
+                window.location.href = "index.html";
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

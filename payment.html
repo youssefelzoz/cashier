@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سند صرف نقدية - تك ستور</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="navbar.css?v=8.0">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg: #f3f4f6;
+            --panel: #ffffff;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: row;
+        }
+
+        .page-container {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .voucher-card {
+            background: var(--panel);
+            border-radius: 16px;
+            padding: 35px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border-top: 8px solid var(--danger);
+            margin-top: 20px;
+        }
+
+        .voucher-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--border);
+            padding-bottom: 20px;
+        }
+
+        .voucher-header h1 {
+            margin: 0;
+            color: var(--danger);
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .voucher-header p {
+            margin: 8px 0 0;
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Cairo';
+            outline: none;
+            transition: 0.3s;
+            background: #f9fafb;
+            color: var(--text);
+            font-weight: bold;
+        }
+
+        .form-control:focus {
+            border-color: var(--danger);
+            background: white;
+        }
+
+        .amount-input-wrapper {
+            position: relative;
+        }
+
+        .amount-input-wrapper input {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--danger);
+            padding-left: 60px;
+            height: 70px;
+        }
+
+        .amount-input-wrapper span {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-light);
+        }
+
+        .balance-info {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+            border: 1px dashed var(--border);
+        }
+
+        .balance-info.active {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* طرق الدفع */
+        .pay-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .pay-methods input[type="radio"] {
+            display: none;
+        }
+
+        .pay-methods label {
+            text-align: center;
+            border: 2px solid var(--border);
+            padding: 12px 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-light);
+            transition: 0.2s;
+            background: #f9fafb;
+        }
+
+        .pay-methods input[type="radio"]:checked+label {
+            border-color: var(--danger);
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Cairo';
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar-container"></div>
+
+    <main class="page-container">
+        <div class="voucher-card">
+            <div class="voucher-header">
+                <h1><i class="bi bi-cash-stack"></i> سند صرف نقدية</h1>
+                <p>إثبات خروج نقدية من الدرج (سداد ديون موردين أو مصروفات عامة)</p>
+            </div>
+
+            <div class="form-group">
+                <label>التاريخ:</label>
+                <input type="date" id="voucherDate" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>الجهة المستفيدة (يُصرف إلى): <span style="color:red">*</span></label>
+                <select id="contactSelect" class="form-control" onchange="showBalance()">
+                    <option value="general">💼 مصروفات عامة (بدون جهة محددة)</option>
+                    <optgroup label="الموردين والعملاء" id="contactsGroup"></optgroup>
+                </select>
+
+                <div id="balanceInfo" class="balance-info">
+                    <span style="color: var(--text-light); font-weight: bold;">الرصيد الحالي للجهة:</span>
+                    <span id="currentBalance" style="font-size: 1.2rem; font-weight: 900; direction: ltr;">0.00</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>المبلغ المصروف: <span style="color:red">*</span></label>
+                <div class="amount-input-wrapper">
+                    <input type="number" id="amount" class="form-control" placeholder="0.00" min="1">
+                    <span>ج.م</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>طريقة الدفع (الخزينة): <span style="color:red">*</span></label>
+                <div class="pay-methods">
+                    <input type="radio" name="payMethod" id="pmCash" value="كاش" checked>
+                    <label for="pmCash">💵 كاش (من الدرج)</label>
+                    <input type="radio" name="payMethod" id="pmVisa" value="فيزا">
+                    <label for="pmVisa">💳 فيزا (بنكي)</label>
+                    <input type="radio" name="payMethod" id="pmWallet" value="محفظة">
+                    <label for="pmWallet">📱 محفظة إلكترونية</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>البيان / سبب الصرف: <span style="color:red">*</span></label>
+                <input type="text" id="notes" class="form-control"
+                    placeholder="مثال: فاتورة كهرباء / دفعة من الحساب...">
+            </div>
+
+            <button class="btn btn-danger" onclick="saveVoucher()"><i class="bi bi-check2-circle"></i> اعتماد الصرف وخصم
+                الرصيد</button>
+        </div>
+    </main>
+
+    <script src="navbar.js?v=8.0"></script>
+    <script>
+        // 🛡️ كود الحماية (نفس اللي عملناه في المشتريات عشان الكاشير ميعبثش في الحسابات)
+        let currentUser = JSON.parse(localStorage.getItem('pos_current_user'));
+        if (!currentUser) {
+            window.location.replace("login.html");
+        } else {
+            const role = currentUser.role ? currentUser.role.trim().toLowerCase() : 'cashier';
+            if (role !== 'admin' && role !== 'أدمن') {
+                Swal.fire({ icon: 'error', title: 'مرفوض', text: 'غير مصرح لك بدخول هذه الصفحة' }).then(() => {
+                    window.location.replace("index.html");
+                });
+            }
+        }
+
+        let contactsDB = JSON.parse(localStorage.getItem('pos_contacts')) || [];
+        let expensesDB = JSON.parse(localStorage.getItem('pos_expenses')) || []; // ده اللي هيسمع في الدرج
+
+        window.onload = function () {
+            document.getElementById('voucherDate').value = new Date().toISOString().split('T')[0];
+
+            const group = document.getElementById('contactsGroup');
+            // نعرض الموردين الأول وبعدين العملاء (لو حبيت ترجع فلوس لعميل)
+            contactsDB.sort((a, b) => a.type.localeCompare(b.type)).forEach(c => {
+                group.innerHTML += `<option value="${c.id}">${c.name} (${c.type})</option>`;
+            });
+        };
+
+        function showBalance() {
+            const contactId = document.getElementById('contactSelect').value;
+            const balanceBox = document.getElementById('balanceInfo');
+            const balanceText = document.getElementById('currentBalance');
+
+            if (contactId && contactId !== 'general') {
+                const contact = contactsDB.find(c => c.id == contactId);
+                let balance = parseFloat(contact.balance) || 0;
+
+                if (balance < 0) {
+                    balanceText.innerText = Math.abs(balance).toFixed(2) + " ج.م (له)";
+                    balanceText.style.color = "var(--danger)";
+                } else if (balance > 0) {
+                    balanceText.innerText = balance.toFixed(2) + " ج.م (عليه)";
+                    balanceText.style.color = "var(--primary)";
+                } else {
+                    balanceText.innerText = "0.00 (خالص)";
+                    balanceText.style.color = "var(--text)";
+                }
+                balanceBox.classList.add('active');
+            } else {
+                balanceBox.classList.remove('active');
+            }
+        }
+
+        function saveVoucher() {
+            const contactId = document.getElementById('contactSelect').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const notes = document.getElementById('notes').value.trim();
+            const date = document.getElementById('voucherDate').value;
+            const method = document.querySelector('input[name="payMethod"]:checked').value;
+
+            if (!amount || amount <= 0) return Swal.fire('تنبيه', 'الرجاء إدخال مبلغ صحيح أكبر من الصفر!', 'warning');
+            if (!notes) return Swal.fire('تنبيه', 'الرجاء كتابة سبب الصرف أو البيان!', 'warning');
+
+            let categoryStr = 'مصروفات عامة';
+            let contactName = 'بدون جهة';
+
+            // 1. تحديث رصيد المورد لو تم اختياره
+            if (contactId !== 'general') {
+                const supIndex = contactsDB.findIndex(c => c.id == contactId);
+                if (supIndex > -1) {
+                    // الدفع بيزود الرصيد (عشان يقلل المديونية السلبية)
+                    contactsDB[supIndex].balance = (parseFloat(contactsDB[supIndex].balance) || 0) + amount;
+                    localStorage.setItem('pos_contacts', JSON.stringify(contactsDB));
+                    contactName = contactsDB[supIndex].name;
+                    categoryStr = contactsDB[supIndex].type === 'مورد' ? 'سداد مورد' : 'مسترد لعميل';
+                }
+            }
+
+            // 2. تسجيل العملية كـ "مصروف" عشان تسمع في درج الكاشير 💡
+            const newExpId = expensesDB.length > 0 ? expensesDB[expensesDB.length - 1].id + 1 : 1;
+
+            // تهيئة التاريخ عشان الفلترة في باقي الصفحات تفهمه صح
+            let formattedDate = new Date(date).toLocaleString('ar-EG');
+
+            const expenseEntry = {
+                id: newExpId,
+                date: formattedDate,
+                category: categoryStr,
+                description: `${notes} - (${contactName})`,
+                amount: amount,
+                method: method,
+                cashierUsername: currentUser ? currentUser.name : 'أدمن'
+            };
+
+            expensesDB.push(expenseEntry);
+            localStorage.setItem('pos_expenses', JSON.stringify(expensesDB));
+
+            Swal.fire({
+                title: 'تم الاعتماد!',
+                text: `تم صرف ${amount} ج.م بنجاح عبر (${method}).`,
+                icon: 'success',
+                confirmButtonText: 'حسناً',
+                confirmButtonColor: '#ef4444'
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+    </script>
+</body>
+
+</html>

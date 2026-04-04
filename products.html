@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الأصناف - تك ستور</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="navbar.css?v=7.1">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: row;
+        }
+
+        .page-container {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .card {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* --- الجداول --- */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: #f1f5f9;
+            padding: 12px;
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+            color: #475569;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f8fafc;
+            text-align: center;
+            vertical-align: middle;
+            font-weight: 600;
+        }
+
+        .stock-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+            min-width: 50px;
+        }
+
+        .stock-main {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .stock-show {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        /* =========================================
+           الـ Modal (النافذة المنبثقة) السحرية
+           ========================================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(3px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: white;
+            width: 95%;
+            max-width: 650px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-box {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--text);
+            font-size: 1.3rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+
+        /* تقليل البادينج الداخلي عشان نلم الفورمة أكثر */
+        .modal-body {
+            padding: 20px 25px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 15px 25px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #f8fafc;
+            border-radius: 0 0 16px 16px;
+        }
+
+        /* --- فورم الـ Modal --- */
+
+        /* 💡 السطر الأول المميز: الباركود صغير والاسم كبير */
+        .form-row-uneven {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            /* الباركود 1 والاسم 2.5 */
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* باقي الحقول بالتساوي */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            transition: 0.3s;
+            font-family: 'Cairo';
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .form-control[readonly] {
+            background: #f1f5f9;
+            cursor: not-allowed;
+            color: #64748b;
+        }
+
+        /* ريسبونسف للموبايل */
+        @media (max-width: 768px) {
+            .form-row-uneven {
+                grid-template-columns: 1fr;
+            }
+
+            /* يرجعوا تحت بعض في الشاشات الصغيرة جداً */
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-box {
+                max-height: 95vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar-container"></div>
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1 class="page-title"><i class="bi bi-box-seam"></i> إدارة الأصناف والمخزون</h1>
+            <button class="btn btn-primary" onclick="openModal()"><i class="bi bi-plus-lg"></i> إضافة صنف جديد</button>
+        </div>
+
+        <div class="card">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
+                <h3 style="margin:0; color: var(--text);">📋 قائمة الأصناف المسجلة</h3>
+                <div style="position: relative;">
+                    <i class="bi bi-search" style="position: absolute; right: 15px; top: 12px; color: #94a3b8;"></i>
+                    <input type="text" id="searchFilter" class="form-control" placeholder="بحث بالاسم أو الكود..."
+                        style="padding-right: 40px; width: 300px;" onkeyup="renderProducts()">
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الكود (الباركود)</th>
+                            <th style="text-align: right;">اسم الصنف</th>
+                            <th>سعر الشراء</th>
+                            <th>سعر البيع</th>
+                            <th>رصيد المخزن</th>
+                            <th>رصيد المعرض</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- النافذة المنبثقة (Modal) -->
+    <div id="productModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalTitle">➕ إضافة صنف جديد</h3>
+                <button class="close-btn" onclick="closeModal()"><i class="bi bi-x-circle-fill"></i></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="editMode" value="false">
+
+                <!-- السطر الأول: الباركود والاسم (بدون سكرول) -->
+                <div class="form-row-uneven">
+                    <div class="form-group">
+                        <label>اسم الصنف <span style="color:red">*</span></label>
+                        <input type="text" id="prodName" class="form-control" placeholder="اسم الصنف بوضوح">
+                    </div>
+                    <div class="form-group">
+                        <label>الباركود <span style="color:red">*</span></label>
+                        <input type="text" id="prodCode" class="form-control" placeholder="مثال: 1001">
+                    </div>
+                </div>
+
+                <!-- باقي الحقول في شبكة عادية -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>سعر الشراء (التكلفة) ج.م</label>
+                        <input type="number" id="prodCost" class="form-control" value="0" min="0" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label>سعر البيع (للجمهور) ج.م</label>
+                        <input type="number" id="prodPrice" class="form-control" value="0" min="0" step="0.5">
+                    </div>
+
+                    <div class="form-group">
+                        <label>الرصيد الافتتاحي (بالمخزن)</label>
+                        <input type="number" id="prodStockMain" class="form-control" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>الرصيد الافتتاحي (بالمعرض)</label>
+                        <input type="number" id="prodStockShow" class="form-control" value="0" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="closeModal()">إلغاء</button>
+                <button class="btn btn-success" onclick="saveProduct()"><i class="bi bi-save"></i> حفظ
+                    التغييرات</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="navbar.js?v=7.1"></script>
+    <script>
+        let productsDB = JSON.parse(localStorage.getItem('pos_products')) || [];
+
+        function openModal(id = null) {
+            const modal = document.getElementById('productModal');
+            document.getElementById('editMode').value = id ? "true" : "false";
+
+            if (id) {
+                document.getElementById('modalTitle').innerHTML = '✏️ تعديل بيانات الصنف';
+                const p = productsDB.find(x => x.id == id);
+                if (p) {
+                    document.getElementById('prodCode').value = p.id;
+                    document.getElementById('prodCode').readOnly = true;
+                    document.getElementById('prodName').value = p.name;
+                    document.getElementById('prodCost').value = p.cost || 0;
+                    document.getElementById('prodPrice').value = p.price || 0;
+                    document.getElementById('prodStockMain').value = p.stock_main || 0;
+                    document.getElementById('prodStockShow').value = p.stock_showroom || 0;
+                }
+            } else {
+                document.getElementById('modalTitle').innerHTML = '➕ إضافة صنف جديد';
+                document.getElementById('prodCode').value = '';
+                document.getElementById('prodCode').readOnly = false;
+                document.getElementById('prodName').value = '';
+                document.getElementById('prodCost').value = '0';
+                document.getElementById('prodPrice').value = '0';
+                document.getElementById('prodStockMain').value = '0';
+                document.getElementById('prodStockShow').value = '0';
+            }
+
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').classList.remove('show');
+        }
+
+        function saveProduct() {
+            const code = document.getElementById('prodCode').value.trim();
+            const name = document.getElementById('prodName').value.trim();
+            const cost = parseFloat(document.getElementById('prodCost').value) || 0;
+            const price = parseFloat(document.getElementById('prodPrice').value) || 0;
+            const stockMain = parseFloat(document.getElementById('prodStockMain').value) || 0;
+            const stockShow = parseFloat(document.getElementById('prodStockShow').value) || 0;
+            const isEdit = document.getElementById('editMode').value === "true";
+
+            if (!code || !name) {
+                return Swal.fire('بيانات ناقصة', 'يجب إدخال كود واسم الصنف كحد أدنى!', 'warning');
+            }
+
+            const existingIndex = productsDB.findIndex(p => p.id == code);
+
+            const productData = {
+                id: code,
+                name: name,
+                cost: cost,
+                price: price,
+                stock_main: stockMain,
+                stock_showroom: stockShow
+            };
+
+            if (isEdit) {
+                if (existingIndex > -1) {
+                    productsDB[existingIndex] = productData;
+                    Swal.fire('نجاح', 'تم تحديث بيانات الصنف بنجاح', 'success');
+                }
+            } else {
+                if (existingIndex > -1) {
+                    return Swal.fire('خطأ', 'هذا الكود (الباركود) مستخدم مسبقاً لصنف آخر!', 'error');
+                }
+                productsDB.push(productData);
+                Swal.fire('نجاح', 'تم إضافة الصنف الجديد بنجاح', 'success');
+            }
+
+            localStorage.setItem('pos_products', JSON.stringify(productsDB));
+            closeModal();
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const filter = document.getElementById('searchFilter').value.toLowerCase();
+            const tbody = document.getElementById('productsTableBody');
+
+            const filtered = productsDB.filter(p => p.name.toLowerCase().includes(filter) || String(p.id).includes(filter));
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="color:#94a3b8; padding:3rem; font-size: 1.1rem;">لا توجد أصناف مطابقة للبحث</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.reverse().map(p => `
+                <tr>
+                    <td style="font-weight: 900; color: #475569;">${p.id}</td>
+                    <td style="text-align: right; color: var(--primary); font-weight: 800;">${p.name}</td>
+                    <td>${p.cost}</td>
+                    <td style="color: var(--success); font-weight: bold;">${p.price}</td>
+                    <td><span class="stock-badge stock-main">${p.stock_main || 0}</span></td>
+                    <td><span class="stock-badge stock-show">${p.stock_showroom || 0}</span></td>
+                    <td>
+                        <button onclick="openModal('${p.id}')" class="btn btn-primary" style="padding: 6px 12px; margin: auto;">
+                            <i class="bi bi-pencil-square"></i> تعديل
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.onload = renderProducts;
+    </script>
+</body>
+
+</html>

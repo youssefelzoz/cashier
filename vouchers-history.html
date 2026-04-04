@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل السندات المالية - تك ستور</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="navbar.css?v=13.0">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: row;
+        }
+
+        .page-container {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* --- Header --- */
+        .page-header {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 20px 25px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-outline {
+            padding: 10px 18px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+
+        /* --- Dashboard --- */
+        .dashboard-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+        }
+
+        .stat-card.in::before {
+            background: var(--success);
+        }
+
+        .stat-card.out::before {
+            background: var(--danger);
+        }
+
+        .stat-card.net::before {
+            background: var(--primary);
+        }
+
+        .stat-card.cash::before {
+            background: var(--success);
+        }
+
+        .stat-card.visa::before {
+            background: var(--info);
+        }
+
+        .stat-card.wallet::before {
+            background: var(--warning);
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: white;
+        }
+
+        .stat-card.in .stat-icon {
+            background: var(--success);
+        }
+
+        .stat-card.out .stat-icon {
+            background: var(--danger);
+        }
+
+        .stat-card.net {
+            background: #1e293b;
+            color: white;
+            border: none;
+        }
+
+        .stat-card.net .stat-icon {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .stat-card.cash .stat-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .stat-card.visa .stat-icon {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        .stat-card.wallet .stat-icon {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-light);
+            margin-bottom: 2px;
+        }
+
+        .stat-card.net .stat-title {
+            color: #cbd5e1;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--text);
+        }
+
+        .stat-card.net .stat-value {
+            color: white;
+        }
+
+        /* --- Filter --- */
+        .filter-card {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid var(--border);
+            background: #f8fafc;
+            color: var(--text);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            font-weight: bold;
+            font-family: 'Cairo';
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 46px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 46px;
+        }
+
+        .btn-secondary:hover {
+            background: #0f172a;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        /* --- Table --- */
+        .table-card {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--text-light);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #f8fafc;
+            font-weight: 600;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .method-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--primary);
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            color: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* --- Print Area --- */
+        @media screen {
+            #print-area {
+                display: none;
+            }
+        }
+
+        @media print {
+            @page {
+                margin: 0;
+                size: 80mm auto;
+            }
+
+            html,
+            body {
+                height: auto !important;
+                overflow: visible !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+
+            body>*:not(#print-area) {
+                display: none !important;
+            }
+
+            #print-area {
+                display: block !important;
+                width: 80mm !important;
+                max-width: 80mm !important;
+                margin: 0 auto;
+                padding: 2mm 4mm;
+                background: white;
+                direction: rtl;
+                overflow: hidden;
+                box-sizing: border-box;
+            }
+
+            #print-area * {
+                color: #000 !important;
+                font-family: 'Courier New', Courier, monospace, sans-serif !important;
+                font-weight: 700;
+            }
+
+            hr {
+                border: none;
+                border-top: 1px dashed #000;
+                margin: 6px 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar-container"></div>
+
+    <main class="page-container">
+
+        <div class="page-header">
+            <h1 class="page-title"><i class="bi bi-journals" style="color: var(--primary);"></i> سجل السندات المالية
+                (الخزينة)</h1>
+            <button class="btn-outline" onclick="window.print()"><i class="bi bi-printer"></i> طباعة التقرير</button>
+        </div>
+
+        <div class="dashboard-row">
+            <div class="stat-card in">
+                <div class="stat-icon"><i class="bi bi-box-arrow-in-down"></i></div>
+                <div class="stat-info">
+                    <span class="stat-title">إجمالي المقبوضات (داخل)</span>
+                    <span class="stat-value" id="totalIn">0.00 ج.م</span>
+                </div>
+            </div>
+            <div class="stat-card out">
+                <div class="stat-icon"><i class="bi bi-box-arrow-up"></i></div>
+                <div class="stat-info">
+                    <span class="stat-title">إجمالي المدفوعات (خارج)</span>
+                    <span class="stat-value" id="totalOut">0.00 ج.م</span>
+                </div>
+            </div>
+            <div class="stat-card net">
+                <div class="stat-icon"><i class="bi bi-wallet2"></i></div>
+                <div class="stat-info">
+                    <span class="stat-title">الصافي الكلي للسندات</span>
+                    <span class="stat-value" id="netBalance">0.00 ج.م</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-row" style="margin-bottom: 25px;">
+            <div class="stat-card cash">
+                <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+                <div class="stat-info">
+                    <span class="stat-title">صافي السندات (كاش)</span>
+                    <span class="stat-value" id="netCash">0.00 ج.م</span>
+                </div>
+            </div>
+            <div class="stat-card visa">
+                <div class="stat-icon"><i class="bi bi-credit-card-fill"></i></div>
+                <div class="stat-info">
+                    <span class="stat-title">صافي السندات (فيزا)</span>
+                    <span class="stat-value" id="netVisa">0.00 ج.م</span>
+                </div>
+            </div>
+            <div class="stat-card wallet">
+                <div class="stat-icon"><i class="bi bi-phone-vibrate-fill"></i></div>
+                <div class="stat-info">
+                    <span class="stat-title">صافي السندات (محافظ)</span>
+                    <span class="stat-value" id="netWallet">0.00 ج.م</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-card">
+            <div class="form-group">
+                <label>من تاريخ:</label>
+                <input type="date" id="dateFrom" class="form-control" onchange="filterAndRender()">
+            </div>
+            <div class="form-group">
+                <label>إلى تاريخ:</label>
+                <input type="date" id="dateTo" class="form-control" onchange="filterAndRender()">
+            </div>
+            <div class="form-group">
+                <label>نوع السند:</label>
+                <select id="typeFilter" class="form-control" onchange="filterAndRender()">
+                    <option value="all">الكل (قبض ودفع)</option>
+                    <option value="قبض">سندات القبض (تحصيلات)</option>
+                    <option value="دفع">سندات الدفع (مصروفات وسداد)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>بحث (الجهة أو البيان):</label>
+                <input type="text" id="searchInput" class="form-control" placeholder="ابحث..."
+                    onkeyup="filterAndRender()">
+            </div>
+
+            <div class="filter-actions">
+                <button class="btn-primary" onclick="filterAndRender()"><i class="bi bi-search"></i> بحث</button>
+                <button class="btn-secondary" onclick="showAllVouchers()"><i class="bi bi-infinity"></i> كل
+                    الأيام</button>
+                <button class="btn-outline" style="border-color: var(--primary); color: var(--primary); height: 46px;"
+                    onclick="resetFilters()"><i class="bi bi-calendar-day"></i> اليوم فقط</button>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="8%">رقم</th>
+                        <th width="15%">التاريخ</th>
+                        <th width="10%">النوع</th>
+                        <th width="20%">الجهة / العميل</th>
+                        <th width="12%">المبلغ</th>
+                        <th width="25%">البيان</th>
+                        <th width="10%">طباعة</th>
+                    </tr>
+                </thead>
+                <tbody id="vouchersTableBody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="print-area"></div>
+
+    <script src="navbar.js?v=13.0"></script>
+    <script>
+        // 🛡️ الحماية
+        let currentUser = JSON.parse(localStorage.getItem('pos_current_user'));
+        if (!currentUser) window.location.replace("login.html");
+        else {
+            const role = currentUser.role ? currentUser.role.trim().toLowerCase() : 'cashier';
+            if (role !== 'admin' && role !== 'أدمن') {
+                document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20vh;'>غير مصرح لك بالدخول لهذه الصفحة.</h1>";
+            }
+        }
+
+        let combinedVouchers = [];
+        let appSettings = JSON.parse(localStorage.getItem('pos_settings')) || { storeName: "تك ستور" };
+
+        // 💡 دالة التاريخ المحلي السليمة
+        function getLocalTodayFormatted() {
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        window.onload = function () {
+            const todayFormatted = getLocalTodayFormatted();
+
+            // سحب الفلاتر المحفوظة
+            let savedFrom = localStorage.getItem('pos_vh_dateFrom');
+            let savedTo = localStorage.getItem('pos_vh_dateTo');
+
+            document.getElementById('dateFrom').value = savedFrom !== null ? savedFrom : todayFormatted;
+            document.getElementById('dateTo').value = savedTo !== null ? savedTo : todayFormatted;
+            document.getElementById('typeFilter').value = localStorage.getItem('pos_vh_type') || 'all';
+            document.getElementById('searchInput').value = localStorage.getItem('pos_vh_search') || '';
+
+            loadVouchers();
+            filterAndRender();
+
+            // 💡 رادار ذكي لإجبار الناف بار (الأكورديون) على الفتح
+            const checkNavbar = setInterval(() => {
+                const myLink = document.querySelector('a[href*="vouchers-history.html"]');
+                if (myLink) {
+                    clearInterval(checkNavbar);
+                    myLink.classList.add('active');
+
+                    const parentMenu = myLink.closest('.dropdown-menu') || myLink.closest('ul');
+                    if (parentMenu) {
+                        parentMenu.style.display = 'flex';
+                        parentMenu.style.flexDirection = 'column';
+                        parentMenu.style.visibility = 'visible';
+                        parentMenu.style.opacity = '1';
+                        parentMenu.classList.add('show', 'open', 'active');
+
+                        const parentItem = myLink.closest('.nav-item');
+                        if (parentItem) {
+                            parentItem.classList.add('open', 'active');
+                            const mainToggle = parentItem.querySelector('.nav-link');
+                            if (mainToggle) mainToggle.classList.add('active');
+                        }
+                    }
+                }
+            }, 100);
+        };
+
+        // 💡 عرض كل السندات (مسح التواريخ)
+        function showAllVouchers() {
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            filterAndRender();
+        }
+
+        // 💡 إرجاع الفلاتر لتاريخ اليوم فقط محلياً
+        function resetFilters() {
+            const todayFormatted = getLocalTodayFormatted();
+            document.getElementById('dateFrom').value = todayFormatted;
+            document.getElementById('dateTo').value = todayFormatted;
+            filterAndRender();
+        }
+
+        function parseDateSafely(dateStr) {
+            if (!dateStr) return new Date(0);
+            const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            let englishStr = String(dateStr).replace(/[٠-٩]/g, w => arabicNumbers.indexOf(w));
+            let cleanStr = englishStr.replace(/[\u200B-\u200D\uFEFF\u200E\u200F]/g, '');
+            let datePart = cleanStr.split(/[, ]+/)[0].trim();
+            let parts = datePart.split(/[\/\-]/);
+
+            if (parts.length >= 3) {
+                let p0 = parseInt(parts[0], 10), p1 = parseInt(parts[1], 10), p2 = parseInt(parts[2], 10);
+                let y = p2 > 1000 ? p2 : p0, m = p2 > 1000 ? p1 : p1, d = p2 > 1000 ? p0 : p2;
+                return new Date(y, m - 1, d);
+            }
+            return new Date(0);
+        }
+
+        function loadVouchers() {
+            combinedVouchers = [];
+            let payments = JSON.parse(localStorage.getItem('pos_payments')) || [];
+            let expenses = JSON.parse(localStorage.getItem('pos_expenses')) || [];
+
+            payments.forEach(p => {
+                if (p.type === 'تحصيل') {
+                    combinedVouchers.push({
+                        id: p.id, type: 'قبض', badge: 'badge-success', date: p.date,
+                        contact: p.customerName || 'بدون جهة', amount: parseFloat(p.amount) || 0,
+                        method: p.method, notes: p.notes || 'تحصيل دفعة', cashier: p.cashier || 'غير معروف',
+                        timestamp: parseDateSafely(p.date).getTime()
+                    });
+                }
+            });
+
+            expenses.forEach(e => {
+                let contactName = 'بدون جهة';
+                let notesClean = e.description || '';
+                if (notesClean.includes(' - (')) {
+                    let parts = notesClean.split(' - (');
+                    notesClean = parts[0];
+                    contactName = parts[1].replace(')', '');
+                }
+
+                combinedVouchers.push({
+                    id: e.id, type: 'دفع', badge: 'badge-danger', date: e.date,
+                    contact: contactName, amount: parseFloat(e.amount) || 0,
+                    method: e.method || e.paymentMethod, notes: notesClean, cashier: e.cashierUsername || 'غير معروف',
+                    timestamp: parseDateSafely(e.date).getTime()
+                });
+            });
+
+            combinedVouchers.sort((a, b) => b.timestamp - a.timestamp);
+        }
+
+        function filterAndRender() {
+            const fromVal = document.getElementById('dateFrom').value;
+            const toVal = document.getElementById('dateTo').value;
+            const typeVal = document.getElementById('typeFilter').value;
+            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+
+            // 💡 حفظ الفلاتر الجديدة في اللوكل ستوريدج (بما فيها مسح التاريخ لو عرضنا الكل)
+            localStorage.setItem('pos_vh_dateFrom', fromVal);
+            localStorage.setItem('pos_vh_dateTo', toVal);
+            localStorage.setItem('pos_vh_type', typeVal);
+            localStorage.setItem('pos_vh_search', searchVal);
+
+            let filtered = [...combinedVouchers];
+
+            if (fromVal && toVal) {
+                const fromD = new Date(fromVal); fromD.setHours(0, 0, 0, 0);
+                const toD = new Date(toVal); toD.setHours(23, 59, 59, 999);
+
+                filtered = filtered.filter(v => {
+                    const vDate = parseDateSafely(v.date);
+                    return vDate >= fromD && vDate <= toD;
+                });
+            }
+
+            if (typeVal !== 'all') {
+                filtered = filtered.filter(v => v.type === typeVal);
+            }
+
+            if (searchVal) {
+                filtered = filtered.filter(v =>
+                    String(v.id).includes(searchVal) ||
+                    v.contact.toLowerCase().includes(searchVal) ||
+                    v.notes.toLowerCase().includes(searchVal)
+                );
+            }
+
+            let tIn = 0, tOut = 0;
+            let cashIn = 0, cashOut = 0;
+            let visaIn = 0, visaOut = 0;
+            let walletIn = 0, walletOut = 0;
+
+            filtered.forEach(v => {
+                let amt = v.amount;
+                if (v.type === 'قبض') {
+                    tIn += amt;
+                    if (v.method === 'فيزا') visaIn += amt;
+                    else if (v.method === 'محفظة') walletIn += amt;
+                    else cashIn += amt;
+                } else {
+                    tOut += amt;
+                    if (v.method === 'فيزا') visaOut += amt;
+                    else if (v.method === 'محفظة') walletOut += amt;
+                    else cashOut += amt;
+                }
+            });
+
+            document.getElementById('totalIn').innerText = tIn.toFixed(2) + " ج.م";
+            document.getElementById('totalOut').innerText = tOut.toFixed(2) + " ج.م";
+            document.getElementById('netBalance').innerText = (tIn - tOut).toFixed(2) + " ج.م";
+
+            document.getElementById('netCash').innerText = (cashIn - cashOut).toFixed(2) + " ج.م";
+            document.getElementById('netVisa').innerText = (visaIn - visaOut).toFixed(2) + " ج.م";
+            document.getElementById('netWallet').innerText = (walletIn - walletOut).toFixed(2) + " ج.م";
+
+            const tbody = document.getElementById('vouchersTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="padding: 3rem; color: var(--text-light); text-align:center;"><i class="bi bi-file-earmark-x" style="font-size:2.5rem; display:block; margin-bottom:10px;"></i> لا توجد سندات مطابقة للبحث.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(v => {
+                let icon = v.type === 'قبض' ? '<i class="bi bi-arrow-down-left-circle-fill"></i>' : '<i class="bi bi-arrow-up-right-circle-fill"></i>';
+                return `
+                <tr>
+                    <td style="font-weight:900; color:var(--primary-dark);">#${v.id}</td>
+                    <td style="font-size:0.85rem; color:var(--text-light);">${v.date}</td>
+                    <td><span class="badge ${v.badge}">${icon} ${v.type}</span></td>
+                    <td style="font-weight:bold;">${v.contact}</td>
+                    <td style="font-weight:900; font-size:1.1rem;">${v.amount.toFixed(2)}</td>
+                    <td>
+                        <div style="font-size:0.9rem;">${v.notes}</div>
+                        <span class="method-badge mt-1"><i class="bi bi-credit-card"></i> ${v.method || 'كاش'}</span>
+                    </td>
+                    <td>
+                        <button class="action-btn" onclick="printVoucher(${v.id}, '${v.type}')" title="طباعة السند"><i class="bi bi-printer"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function printVoucher(id, type) {
+            const v = combinedVouchers.find(x => x.id === id && x.type === type);
+            if (!v) return;
+
+            let titleStr = type === 'قبض' ? 'سند استلام نقدية' : 'سند صرف نقدية';
+            let titleColor = type === 'قبض' ? '#10b981' : '#ef4444';
+            let partyLabel = type === 'قبض' ? 'استلمنا من السيد/ة:' : 'يُصرف إلى السيد/ة:';
+
+            let receiptHTML = `
+            <div style="direction: rtl; width: 100%; border: 2px solid #000; padding: 10px; border-radius: 8px;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <h2 style="margin: 0; font-size: 1.6rem; font-family: 'Cairo', sans-serif;">${appSettings.storeName}</h2>
+                    <h3 style="margin: 5px 0; color: ${titleColor}; font-size: 1.3rem;">${titleStr}</h3>
+                    <p style="margin: 0; font-size: 0.9rem; border: 1px solid #000; display: inline-block; padding: 2px 10px;">رقم السند: ${v.id}</p>
+                </div>
+                <hr>
+                <div style="font-size: 1rem; line-height: 1.8; margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between;"><strong>التاريخ:</strong> <span>${v.date}</span></div>
+                    <div style="display: flex; justify-content: space-between;"><strong>${partyLabel}</strong> <span style="font-weight:900; font-size:1.1rem;">${v.contact}</span></div>
+                    <div style="display: flex; justify-content: space-between;"><strong>مبلغ وقدره:</strong> <span style="font-weight:900; font-size:1.3rem;">${v.amount.toFixed(2)} ج.م</span></div>
+                    <div style="display: flex; justify-content: space-between;"><strong>طريقة الدفع:</strong> <span>${v.method || 'كاش'}</span></div>
+                    <div style="display: flex; justify-content: space-between; border-top: 1px dashed #ccc; padding-top: 5px; margin-top: 5px;"><strong>البيان:</strong> <span>${v.notes}</span></div>
+                </div>
+                <hr>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 15px;">
+                    <div style="text-align: center;"><strong>توقيع المستلم</strong><br>....................</div>
+                    <div style="text-align: center;"><strong>المحاسب/الكاشير</strong><br>${v.cashier}</div>
+                </div>
+            </div>`;
+
+            document.getElementById('print-area').innerHTML = receiptHTML;
+            setTimeout(() => { window.print(); }, 150);
+        }
+    </script>
+</body>
+
+</html>

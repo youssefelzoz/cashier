@@ -1,0 +1,258 @@
+/* --- ERP Slim Sidebar (Compact Design) --- */
+:root {
+    --sidebar-width: 240px;
+    /* صغرنا العرض شوية */
+    --sidebar-collapsed: 65px;
+    /* صغرنا العرض وهو مقفول */
+    --sidebar-bg: #0f172a;
+    --sidebar-hover: #1e293b;
+    --sidebar-active: #3b82f6;
+    --sidebar-sub-bg: rgba(0, 0, 0, 0.2);
+}
+
+/* تعطيل الأنيميشن وقت التحميل عشان القوائم متعملش حركة مزعجة */
+.preload-transitions * {
+    transition: none !important;
+}
+
+#navbar-container {
+    height: 100vh;
+    background: var(--sidebar-bg);
+    transition: width 0.4s cubic-bezier(0.075, 0.82, 0.165, 1);
+    /* أنيميشن أسرع وأنعم */
+    width: var(--sidebar-width);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+#navbar-container.collapsed {
+    width: var(--sidebar-collapsed);
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: white;
+}
+
+.sidebar-header {
+    padding: 10px 15px;
+    /* تقليل البادينج */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    min-height: 60px;
+    /* تقليل الارتفاع */
+}
+
+.sidebar-logo {
+    font-size: 1rem;
+    /* تصغير الخط */
+    font-weight: 800;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* تقليل الفجوة */
+    white-space: nowrap;
+}
+
+#navbar-container.collapsed .sidebar-logo span {
+    display: none;
+}
+
+.toggle-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* القائمة الأساسية - مضغوطة */
+.nav-links {
+    list-style: none;
+    padding: 8px 0;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    /* تقليل البادينج جداً */
+    color: #94a3b8;
+    background-color: #0e1b33;
+    align-content: center;
+    text-decoration: none;
+    gap: 12px;
+    /* تقليل الفجوة */
+    transition: all 0.3s ease;
+    margin: 1px 6px;
+    /* تقليل المارجن */
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    /* تصغير الخط */
+}
+
+.nav-link i {
+    font-size: 1.1rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+.nav-link:hover {
+    background: var(--sidebar-hover);
+    color: white;
+    transform: scale(1.02);
+}
+
+.nav-link.active {
+    background: var(--sidebar-active);
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+    color: white;
+}
+
+/* --- الأكورديون (Groups) --- */
+.has-submenu .menu-arrow {
+    margin-right: auto;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.65rem;
+}
+
+.has-submenu.expanded .menu-arrow {
+    transform: rotate(180deg);
+}
+
+.nav-item-group {
+    list-style: none;
+    background: var(--sidebar-sub-bg);
+    margin: 0 6px;
+    border-radius: 8px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s;
+    opacity: 0;
+}
+
+.nav-item-group.open {
+    max-height: 400px;
+    padding: 4px 0;
+    margin-bottom: 4px;
+    opacity: 1;
+}
+
+.nav-item-group .nav-link {
+    font-size: 0.8rem;
+    padding: 10px 16px;
+    margin: 1px 4px;
+}
+
+/* حالة الغلق (Collapsed) */
+#navbar-container.collapsed .nav-link span,
+#navbar-container.collapsed .menu-arrow {
+    opacity: 0;
+    width: 0;
+    display: none;
+}
+
+/* الفوتر (إعدادات وخروج) */
+.sidebar-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 8px 0;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-footer .nav-link {
+    padding: 12px 14px;
+    margin: 1px 6px;
+}
+
+.sidebar-footer .logout-btn {
+    color: #fca5a5;
+}
+
+/* سكرول بار رفيع جداً */
+.nav-links::-webkit-scrollbar {
+    width: 3px;
+}
+
+.nav-links::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+
+/* =======================================================
+   📱 إعدادات الموبايل والتابلت (Floating Overlay Menu)
+   ======================================================= */
+
+/* زرار الموبايل العائم (مخفي في الشاشات الكبيرة) */
+.mobile-toggle-btn {
+    display: none;
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    background: var(--sidebar-active);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 45px;
+    height: 45px;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    z-index: 9999;
+    /* أعلى حاجة في الشاشة */
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: 0.3s;
+}
+
+@media (max-width: 950px) {
+
+    /* 1. إظهار زرار القائمة العائم */
+    .mobile-toggle-btn {
+        display: flex;
+    }
+
+    /* 2. فصل السايد بار عن الصفحة عشان ميزقهاش (Position Fixed) */
+    #navbar-container {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        /* نخبيه برا الشاشة يمين */
+        height: 100vh;
+        width: 260px !important;
+        /* نثبت عرضه في الموبايل */
+        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 9998;
+        /* تحت الزرار بخطوة */
+        box-shadow: none;
+    }
+
+    /* كلاس الفتح للموبايل */
+    #navbar-container.mobile-open {
+        right: 0;
+        /* يظهر جوا الشاشة */
+        box-shadow: -15px 0 50px rgba(0, 0, 0, 0.7);
+        /* ضل قوي عشان يبان إنه طايف فوق الصفحة */
+    }
+
+    /* 3. إخفاء زرار التصغير بتاع الديسكتوب لأنه ملوش لازمة هنا */
+    .sidebar-header .toggle-btn {
+        display: none;
+    }
+}
