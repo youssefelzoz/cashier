@@ -30,7 +30,6 @@
         body {
             max-width: 100%;
             overflow: hidden;
-            /* هنعدلها في الموبايل */
         }
 
         body {
@@ -56,7 +55,6 @@
             border-radius: 10px !important;
         }
 
-        /* حاوية الشاشة الرئيسية */
         .main-container {
             display: grid;
             grid-template-columns: 1fr 380px;
@@ -586,43 +584,33 @@
             background: #fca5a5;
         }
 
-        /* =======================================================
-           📱 الميديا كويري (Responsive) للموبايل والتابلت
-           ======================================================= */
         @media (max-width: 950px) {
 
             html,
             body {
                 overflow: auto !important;
-                /* السماح بالسكرول في الموبايل */
                 height: auto;
             }
 
             .main-container {
                 grid-template-columns: 1fr;
-                /* رص العناصر تحت بعضها */
                 height: auto;
                 overflow: visible;
                 padding-top: 80px;
-                /* مسافة عشان زرار القائمة العائم */
                 padding-bottom: 20px;
                 gap: 15px;
             }
 
             .cart-panel {
                 height: 55vh;
-                /* تحديد طول مناسب للفاتورة في الموبايل عشان الشاشة متطولش أوي */
                 min-height: 350px;
             }
 
             .led-box {
                 height: auto;
-                /* يسحب مساحته براحته */
                 padding: 15px 10px;
-                /* تقليل الحواف الجانبية شوية */
             }
 
-            /* تظبيط شريط البحث وزرايره */
             .search-area {
                 flex-wrap: wrap;
             }
@@ -630,26 +618,21 @@
             #barcodeInput {
                 min-width: 100%;
                 order: -1;
-                /* يخلي البحث أول حاجة فوق */
             }
 
             .btn-grid-toggle {
                 flex: 1;
-                /* الزراير تاخد مساحات متساوية تحت البحث */
                 padding: 5px;
             }
         }
 
-        /* للموبايلات الصغيرة جداً */
         @media (max-width: 500px) {
             .customer-info-grid {
                 grid-template-columns: 1fr;
-                /* اسم العميل ورقم تليفونه تحت بعض */
             }
 
             .financial-calc-grid {
                 grid-template-columns: 1fr;
-                /* الإجمالي والخصم والضريبة تحت بعض */
                 text-align: center;
             }
 
@@ -669,7 +652,6 @@
 
             .action-buttons {
                 grid-template-columns: 1fr;
-                /* زراير الدفع والمسح كلها تحت بعض */
             }
 
             .btn-pay {
@@ -695,7 +677,6 @@
             }
         }
 
-        /* --- إعدادات طباعة الريسيت --- */
         #receipt-view {
             display: none;
             background: rgba(0, 0, 0, 0.8);
@@ -783,8 +764,6 @@
             <div class="search-area">
                 <input type="text" id="barcodeInput" placeholder="امسح الباركود أو ابحث عن الصنف..." autocomplete="off"
                     autofocus>
-                <button id="btnCustomRepair" class="btn-grid-toggle" style="color: var(--info)"
-                    onclick="promptCustomItem()" title="إضافة صيانة حرة">🛠️</button>
                 <button id="toggleGridBtn" class="btn-grid-toggle" onclick="toggleVisualGrid()"
                     title="عرض شبكة المنتجات">📦</button>
                 <div id="searchResults"></div>
@@ -1019,22 +998,6 @@
             }).join('');
         }
 
-        async function promptCustomItem() {
-            const { value: formValues } = await Swal.fire({
-                title: '🛠️ إضافة صيانة حرة', width: '420px',
-                html: `<div style="display:flex;flex-direction:column;gap:15px;"><input id="swal-repair-name" class="swal2-input" placeholder="وصف الصيانة (مثال: تغيير شاشة)"><input id="swal-repair-price" type="number" class="swal2-input" placeholder="السعر الإجمالي (ج.م)"><select id="swal-repair-tech" class="swal2-select" style="width:100%;margin:0;"><option value="">-- اختر الفني --</option><option value="أحمد">أحمد</option><option value="محمود">محمود</option><option value="صيانة خارجية">صيانة خارجية</option></select></div>`,
-                focusConfirm: false, showCancelButton: true, confirmButtonColor: '#10b981', cancelButtonColor: '#ef4444', confirmButtonText: 'إضافة للفاتورة', cancelButtonText: 'إلغاء',
-                preConfirm: () => [document.getElementById('swal-repair-name').value, document.getElementById('swal-repair-price').value, document.getElementById('swal-repair-tech').value]
-            });
-            if (formValues) {
-                const [name, price, tech] = formValues;
-                if (!name || !price || isNaN(price)) { Swal.fire('خطأ', 'يجب إدخال الوصف والسعر', 'error'); return; }
-                let displayName = tech ? `🛠️ ${name} <br><small style="color:#3b82f6;">(فني: ${tech})</small>` : `🛠️ ${name}`;
-                cart.push({ code: "REPAIR_" + Date.now(), name: displayName, price: parseFloat(price), qty: 1, isRepair: true, techName: tech });
-                playBeep('success'); Toast.fire({ icon: 'success', title: 'تمت الإضافة' }); renderCart(); barcodeInput.focus();
-            }
-        }
-
         function addToCart(code) {
             const product = productsDB[code];
             if (product) {
@@ -1226,7 +1189,7 @@
         }
 
         function closeReceiptAndNew() {
-            isReceiptOpen = false; document.getElementById('receipt-view').style.display = 'none'; document.getElementById('mainContainer').style.display = 'grid'; // Note: grid defaults to desktop layout, media query overrides it
+            isReceiptOpen = false; document.getElementById('receipt-view').style.display = 'none'; document.getElementById('mainContainer').style.display = 'grid';
             if (window.innerWidth <= 950) { document.getElementById('mainContainer').style.display = 'flex'; document.getElementById('mainContainer').style.flexDirection = 'column'; }
             cart = []; localStorage.removeItem('pos_cart'); document.getElementById('amountPaid').value = ''; document.getElementById('discountVal').value = ''; document.getElementById('customerName').value = ''; document.getElementById('customerPhone').value = '';
             const savedPayMethod = localStorage.getItem('pos_pay_method') || 'كاش';
@@ -1251,7 +1214,6 @@
             }
         });
 
-        // إعادة ضبط تخطيط الشاشة في حالة تغير حجمها بعد قفل الريسيت
         window.addEventListener('resize', () => {
             if (!isReceiptOpen) {
                 document.getElementById('mainContainer').style.display = window.innerWidth <= 950 ? 'flex' : 'grid';
